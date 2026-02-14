@@ -1,0 +1,301 @@
+
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowRight, BookOpen, Menu } from 'lucide-react';
+import Link from 'next/link';
+import { Logo } from '@/components/icons';
+import Footer from '@/components/landing/footer';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import Image from 'next/image';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
+import { cn } from '@/lib/utils';
+
+const categories = {
+    GBP_OPTIMIZATION: 'GBP Optimization',
+    AI_SEO: 'AI + Local SEO',
+    MULTI_LOCATION: 'Multi-Location & Agency',
+    REVIEW_MANAGEMENT: 'Review Management',
+};
+
+const articles = [
+    {
+        title: "The Complete Guide to Google Business Profile Optimization",
+        description: "Your comprehensive guide to dominating local search. Learn how to optimize every aspect of your GBP, from core information and photos to Q&A and advanced strategies.",
+        href: "/resources/google-business-profile-optimization",
+        date: "November 2025",
+        imageUrl: "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/public/MGP/Why%20Your%20Google%20Business%20Profile%20is%20Non-Negotiable.jpg",
+        category: categories.GBP_OPTIMIZATION,
+        startHere: true,
+    },
+    {
+        title: "Top Google Business Profile Mistakes That Are Costing You Customers",
+        description: "Fix poor GBP management: the top mistakes that hurt your ranking—inconsistent NAP, neglected reviews, wrong categories. Learn how to fix them and get more customers.",
+        href: "/resources/top-google-business-profile-mistakes",
+        date: "November 2025",
+        imageUrl: "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/public/MGP/Top%20Google%20Business%20Profile%20Mistakes%20That%20Are%20Costing%20You%20Customers.jpg",
+        category: categories.GBP_OPTIMIZATION,
+    },
+     {
+        title: "How to Optimize Your GBP for “Near Me” Searches",
+        description: "Rank higher for 'near me' searches. NAP consistency, local keywords, and GBP management tactics that get you in the local pack.",
+        href: "/resources/how-to-optimize-for-near-me-searches",
+        date: "December 2025",
+        imageUrl: "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/how%20to%20optimize%20your%20gbp.png",
+        category: categories.GBP_OPTIMIZATION,
+    },
+    {
+        title: "The Best Time to Post on Google Business Profile (Based on Data)",
+        description: "Maximize your reach by posting when your customers are most active. This guide analyzes data to reveal the best times to publish Google Posts for local businesses.",
+        href: "/resources/best-time-to-post-on-google-business-profile",
+        date: "December 2025",
+        imageUrl: "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/best%20time%20to%20post.png",
+        category: categories.GBP_OPTIMIZATION,
+    },
+     {
+        title: "How Often Should You Update Photos on Your GBP?",
+        description: "Find out the ideal frequency for uploading new photos to your Google Business Profile to boost local SEO, customer engagement, and search rankings.",
+        href: "/resources/how-often-to-update-photos-on-gbp",
+        date: "December 2025",
+        imageUrl: "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/how%20often%20should%20you%20post.png",
+        category: categories.GBP_OPTIMIZATION,
+    },
+     {
+        title: "Google Business Categories: How to Pick the Right One (and Why It Matters)",
+        description: "Your Google Business Profile category is a top local ranking factor. Learn how to choose the right primary and secondary categories to attract the right customers.",
+        href: "/resources/how-to-pick-google-business-categories",
+        date: "January 2026",
+        imageUrl: "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/google%20business%20categories.png",
+        category: categories.GBP_OPTIMIZATION,
+    },
+    {
+        title: "How to Use UTM Tracking for Your GBP Website Link",
+        description: "Unlock deeper insights into your local SEO efforts by learning how to properly use UTM parameters on your Google Business Profile website and posts links.",
+        href: "/resources/how-to-use-utm-tracking-for-gbp",
+        date: "January 2026",
+        imageUrl: "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/utm%20tracking.png",
+        category: categories.GBP_OPTIMIZATION,
+    },
+    {
+        title: "AI and Local SEO: How AI Transforms Google Business Profile Management",
+        description: "Fix poor GBP management with AI: faster review replies, content ideas, and performance insights. How AI tools for Google Business Profile save time and boost rankings.",
+        href: "/resources/ai-and-local-seo",
+        date: "November 2025",
+        imageUrl: "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/public/MGP/AI%20and%20Local%20SEO.jpg",
+        category: categories.AI_SEO,
+    },
+    {
+        title: "7 Ways AI Can Improve Your Google Business Rankings",
+        description: "From automating review responses to generating localized content, discover 7 practical ways AI tools can directly boost your Google Business Profile rankings and local SEO performance.",
+        href: "/resources/7-ways-ai-can-improve-gbp-rankings",
+        date: "December 2025",
+        imageUrl: "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/7%20Ways%20AI%20Can%20Improve%20Your%20Google%20Business%20Rankings.png",
+        category: categories.AI_SEO,
+    },
+    {
+        title: "How to Automate GBP Review Replies with AI (Safely)",
+        description: "Stop losing customers to slow replies. How to automate Google review responses with AI safely—personal tone, no generic answers, hours saved every week.",
+        href: "/resources/how-to-automate-gbp-review-replies-with-ai",
+        date: "January 2026",
+        imageUrl: "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/How%20to%20Automate%20GBP%20Review%20Replies%20with%20AI.png",
+        category: categories.AI_SEO,
+    },
+     {
+        title: "Comparing ChatGPT, Gemini, and MyGoProfile for Local SEO Tasks",
+        description: "A head-to-head comparison of general AI chatbots like ChatGPT and Gemini versus a specialized local SEO tool like MyGoProfile for Google Business Profile management.",
+        href: "/resources/comparing-chatgpt-gemini-mygoprofile",
+        date: "January 2026",
+        imageUrl: "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/Comparing%20ChatGPT,%20Gemini,%20and%20MyGoProfile%20for%20Local%20SEO%20Tasks.png",
+        category: categories.AI_SEO,
+    },
+    {
+        title: "AI-Powered Content Ideas for Your Google Posts",
+        description: "Never run out of things to post on your Google Business Profile again. This guide provides actionable content ideas you can generate with AI to keep your profile fresh and engaging.",
+        href: "/resources/ai-powered-content-ideas-for-google-posts",
+        date: "December 2025",
+        imageUrl: "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/AI-Powered%20Content%20Ideas%20for%20Your%20Google%20Posts.png",
+        category: categories.AI_SEO,
+    },
+    {
+        title: "Future of Local Search: How Google’s AI Overviews Will Impact Businesses",
+        description: "Google’s new AI Overviews are changing search. Learn how this will affect your local business and why a fully optimized Google Business Profile is more important than ever.",
+        href: "/resources/future-of-local-search-with-ai-overviews",
+        date: "January 2026",
+        imageUrl: "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/Future%20of%20Local%20Search.png",
+        category: categories.AI_SEO,
+    },
+    {
+        title: "Multi-Location SEO: How to Manage Google Business Profiles at Scale",
+        description: "Master multi-location SEO by learning to efficiently manage multiple Google Business Profiles. Our guide covers consistency, local optimization, and scaling strategies for franchises.",
+        href: "/resources/multi-location-seo-management",
+        date: "November 2025",
+        imageUrl: "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/public/MGP/Multi-Location%20SEO%20How%20to%20Manage%20Google%20Business%20Profiles%20at%20Scale.jpg",
+        category: categories.MULTI_LOCATION,
+    },
+    {
+        title: "Does Responding to Google Reviews Boost Your Local SEO?",
+        description: "Uncover the truth about how replying to customer reviews impacts your local search rankings. Learn why engagement is a key signal for Google and how to respond effectively.",
+        href: "/resources/does-responding-to-google-reviews-boost-seo",
+        date: "February 2026",
+        imageUrl: "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/public/MGP/Does%20Responding%20to%20Google%20Reviews%20Boost%20Your%20Local%20SEO.jpg",
+        category: categories.REVIEW_MANAGEMENT,
+    }
+];
+
+const categoryOrder = [
+    categories.GBP_OPTIMIZATION,
+    categories.AI_SEO,
+    categories.MULTI_LOCATION,
+    categories.REVIEW_MANAGEMENT,
+];
+
+export default function ResourcesPage() {
+    const [activeCategory, setActiveCategory] = useState<string>('All');
+
+    const filteredArticles = activeCategory === 'All'
+        ? articles
+        : articles.filter(article => article.category === activeCategory);
+
+    const sortedArticles = [...filteredArticles].sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+
+  return (
+    <div className="flex min-h-screen w-full flex-col">
+        <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+            <div className="container flex h-14 max-w-screen-xl items-center justify-between">
+                <Link href="/" className="flex items-center gap-2 font-semibold">
+                    <Logo />
+                    <span>MyGoProfile</span>
+                </Link>
+                <nav className="hidden items-center gap-4 md:flex">
+                     <Link href="/why-mygoprofile">
+                        <Button variant="ghost">Why MyGoProfile?</Button>
+                    </Link>
+                    <Link href="/pricing">
+                        <Button variant="ghost">Pricing</Button>
+                    </Link>
+                    <Link href="/resources">
+                        <Button variant="ghost">Resources</Button>
+                    </Link>
+                    <Link href="/login">
+                        <Button>Start free trial</Button>
+                    </Link>
+                </nav>
+                 <Sheet>
+                    <SheetTrigger asChild>
+                    <Button variant="outline" size="icon" className="shrink-0 md:hidden">
+                        <Menu className="h-5 w-5" />
+                        <span className="sr-only">Toggle navigation menu</span>
+                    </Button>
+                    </SheetTrigger>
+                    <SheetContent side="right">
+                    <nav className="grid gap-6 text-lg font-medium">
+                        <Link href="#" className="flex items-center gap-2 text-lg font-semibold">
+                            <Logo />
+                            <span>MyGoProfile</span>
+                        </Link>
+                        <Link href="/why-mygoprofile" className="text-muted-foreground hover:text-foreground">
+                            Why MyGoProfile?
+                        </Link>
+                        <Link href="/pricing" className="text-muted-foreground hover:text-foreground">
+                            Pricing
+                        </Link>
+                        <Link href="/resources" className="hover:text-foreground">
+                            Resources
+                        </Link>
+                        <Link href="/login" className="text-muted-foreground hover:text-foreground">
+                            Start free trial
+                        </Link>
+                    </nav>
+                    </SheetContent>
+                </Sheet>
+            </div>
+      </header>
+
+      <main className="flex-1">
+        <section className="py-20 text-center">
+            <div className="container max-w-screen-lg">
+                 <Breadcrumbs
+                    items={[
+                        { label: 'Home', href: '/' },
+                        { label: 'Resources' },
+                    ]}
+                    className="mb-8 justify-center"
+                />
+                <h1 className="font-headline text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl">
+                    GBP Management <span className="bg-gradient-brand animate-gradient-flow bg-[length:400%_400%] bg-clip-text text-transparent">Guides</span>
+                </h1>
+                <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground">
+                    Poor GBP management costs you customers. These guides show you how to fix your Google Business Profile—optimization, AI review replies, local SEO—so you rank higher and get more traffic.
+                </p>
+            </div>
+        </section>
+        
+        <section className="pb-20">
+            <div className="container max-w-screen-lg">
+                <div className="flex flex-wrap items-center justify-center gap-2 mb-12">
+                    <Button 
+                        variant={activeCategory === 'All' ? 'default' : 'outline'}
+                        onClick={() => setActiveCategory('All')}
+                    >
+                        All
+                    </Button>
+                    {categoryOrder.map(category => (
+                        <Button 
+                            key={category}
+                            variant={activeCategory === category ? 'default' : 'outline'}
+                            onClick={() => setActiveCategory(category)}
+                        >
+                            {category}
+                        </Button>
+                    ))}
+                </div>
+                <div className="grid gap-8">
+                    {sortedArticles.map((article, index) => (
+                        <Link key={article.title} href={article.href} className="group block">
+                            <Card className="grid grid-cols-1 md:grid-cols-3 overflow-hidden shadow-sm transition-shadow duration-300 group-hover:shadow-xl relative">
+                                {(article as { startHere?: boolean }).startHere && (
+                                    <span className="absolute top-3 left-3 z-10 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground shadow-sm">
+                                        Start here
+                                    </span>
+                                )}
+                                <div className="relative h-48 w-full md:h-full">
+                                    <Image
+                                        src={article.imageUrl}
+                                        alt={article.title}
+                                        fill
+                                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                        data-ai-hint="digital marketing"
+                                    />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <CardHeader>
+                                        <p className="text-sm font-semibold text-primary">{article.category}</p>
+                                        <CardTitle className="group-hover:text-primary pt-1">{article.title}</CardTitle>
+                                        <CardDescription>{article.date}</CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <p className="text-muted-foreground">{article.description}</p>
+                                    </CardContent>
+                                </div>
+                            </Card>
+                        </Link>
+                    ))}
+                </div>
+                 {sortedArticles.length === 0 && (
+                    <div className="text-center py-16 text-muted-foreground">
+                        <p className="font-semibold">No articles in this category yet.</p>
+                        <p>Check back soon!</p>
+                    </div>
+                )}
+            </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
