@@ -13,6 +13,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const lexend = Lexend({ subsets: ["latin"], variable: "--font-lexend" });
 
 const logoUrl = "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/public/MGP/MGP%20logo120px.png";
+const faviconUrl =
+  "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/public/MGP/MGP%20logo%20fav.png";
 const ogImageUrl = "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/public/MGP/opengraph.jpg";
 
 const title = "GBP Management – Fix Poor Google Business Profile with AI";
@@ -27,12 +29,9 @@ export const metadata: Metadata = {
     google: 'zhi3OMPWC6QozOcvsYOlRuh5y7bPK8HnnvAqSpuFRfE',
   },
   icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: 'any' },
-      { url: logoUrl, sizes: 'any' },
-    ],
-    shortcut: logoUrl,
-    apple: logoUrl,
+    icon: faviconUrl,
+    shortcut: faviconUrl,
+    apple: faviconUrl,
   },
   openGraph: {
     siteName: 'MyGoProfile',
