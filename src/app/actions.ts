@@ -1435,8 +1435,16 @@ export async function updateSubscription(sub: Stripe.Subscription) {
     }
 }
 
-// Email actions
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Email actions — lazy init so build doesn't require RESEND_API_KEY
+let _resend: Resend | null = null;
+function getResend(): Resend {
+  if (!_resend) {
+    const key = process.env.RESEND_API_KEY;
+    if (!key) throw new Error('RESEND_API_KEY is not set.');
+    _resend = new Resend(key);
+  }
+  return _resend;
+}
 
 async function sendWelcomeEmail(toEmail: string | null, toName: string | null) {
   if (!process.env.RESEND_API_KEY) {
@@ -1449,7 +1457,7 @@ async function sendWelcomeEmail(toEmail: string | null, toName: string | null) {
   }
 
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: 'MyGoProfile <hello@mygoprofile.com>',
       to: [toEmail],
       subject: 'Welcome to MyGoProfile!',
@@ -1476,7 +1484,7 @@ async function sendNewUserAdminNotification(newUserEmail: string | null, newUser
   const adminEmail = "matthijs@2xgen.com";
 
   try {
-    const { data, error } = await resend.emails.send({
+    const { data, error } = await getResend().emails.send({
       from: 'MyGoProfile <notifications@mygoprofile.com>',
       to: [adminEmail],
       subject: '🎉 New User Sign-Up on MyGoProfile!',
@@ -1505,7 +1513,7 @@ async function sendSubscriptionActiveEmail(toEmail: string | null, toName: strin
     }
 
     try {
-        await resend.emails.send({
+        await getResend().emails.send({
             from: 'MyGoProfile <hello@mygoprofile.com>',
             to: [toEmail],
             subject: 'Your MyGoProfile Subscription is Active!',
@@ -1531,7 +1539,7 @@ async function sendSubscriptionCancelledEmail(toEmail: string | null, toName: st
     }
 
     try {
-        await resend.emails.send({
+        await getResend().emails.send({
             from: 'MyGoProfile <hello@mygoprofile.com>',
             to: [toEmail],
             subject: 'Your MyGoProfile Subscription Has Ended',
@@ -1561,7 +1569,7 @@ export async function joinWaitlist(email: string): Promise<{ ok: boolean; error?
   if (process.env.RESEND_API_KEY) {
     const adminEmail = "matthijs@2xgen.com";
     try {
-      const { error } = await resend.emails.send({
+      const { error } = await getResend().emails.send({
         from: 'MyGoProfile <notifications@mygoprofile.com>',
         to: [adminEmail],
         subject: 'MyGoProfile waitlist signup',
