@@ -8,7 +8,7 @@ import { doc, setDoc, getDoc, serverTimestamp, Timestamp, updateDoc, collection,
 import type { ManagedLocation } from "./dashboard/select-locations/page";
 import { addDays } from "date-fns";
 import { randomBytes } from "crypto";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import Stripe from "stripe";
 import { Resend } from 'resend';
 import WelcomeEmail from '@/emails/welcome-email';
@@ -1116,7 +1116,7 @@ export async function startFreeTrial(userId: string, planId: 'starter' | 'growth
         const { email, displayName } = userDoc.data();
         
         // Create a Stripe Customer
-        const customer = await stripe.customers.create({
+        const customer = await getStripe().customers.create({
             email: email,
             name: displayName,
             metadata: {
@@ -1236,7 +1236,7 @@ export async function createBillingPortalSession(userId: string): Promise<{ url:
         
         const returnUrl = 'https://mygoprofile.com/dashboard/settings';
 
-        const portalSession = await stripe.billingPortal.sessions.create({
+        const portalSession = await getStripe().billingPortal.sessions.create({
             customer: stripeCustomerId,
             return_url: returnUrl,
         });
@@ -1280,7 +1280,7 @@ export async function createCheckoutSession(userId: string, planId: 'starter' | 
         const successUrl = 'https://mygoprofile.com/';
         const cancelUrl = 'https://mygoprofile.com/welcome';
 
-        const checkoutSession = await stripe.checkout.sessions.create({
+        const checkoutSession = await getStripe().checkout.sessions.create({
             customer: stripeCustomerId,
             mode: 'subscription',
             line_items: [{

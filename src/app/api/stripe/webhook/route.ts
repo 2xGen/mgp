@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import Stripe from 'stripe';
-import { stripe } from '@/lib/stripe';
+import { getStripe } from '@/lib/stripe';
 import { updateSubscription } from '@/app/actions';
 
 async function handler(req: NextRequest) {
@@ -18,7 +18,7 @@ async function handler(req: NextRequest) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    event = getStripe().webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err: any) {
     console.error(`❌ Error message: ${err.message}`);
     return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
@@ -43,7 +43,7 @@ async function handler(req: NextRequest) {
                     console.log(`Checkout session ${session.id} did not create a subscription.`);
                     return new NextResponse('OK', { status: 200 });
                 }
-                subscription = await stripe.subscriptions.retrieve(session.subscription as string, {
+                subscription = await getStripe().subscriptions.retrieve(session.subscription as string, {
                     expand: ['items.data.price.product']
                 });
                 break;
@@ -54,7 +54,7 @@ async function handler(req: NextRequest) {
                     console.log(`Invoice ${invoice.id} does not have a subscription.`);
                     return new NextResponse('OK', { status: 200 });
                  }
-                subscription = await stripe.subscriptions.retrieve(invoice.subscription, {
+                subscription = await getStripe().subscriptions.retrieve(invoice.subscription, {
                     expand: ['items.data.price.product']
                 });
                 break;

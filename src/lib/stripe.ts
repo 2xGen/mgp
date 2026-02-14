@@ -1,10 +1,21 @@
 import Stripe from 'stripe';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not set in the environment variables.');
-}
+let _stripe: Stripe | null = null;
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-06-20',
-  typescript: true,
-});
+/**
+ * Returns the Stripe client. Throws only when called at runtime without STRIPE_SECRET_KEY.
+ * Lazy init avoids breaking the build when env vars are not available (e.g. Vercel build).
+ */
+export function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new Error('STRIPE_SECRET_KEY is not set in the environment variables.');
+    }
+    _stripe = new Stripe(key, {
+      apiVersion: '2024-06-20',
+      typescript: true,
+    });
+  }
+  return _stripe;
+}
