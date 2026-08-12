@@ -13,12 +13,12 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 const imageUrl = "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/utm%20tracking.png";
 
 export const metadata: Metadata = {
-  title: 'How to Use UTM Tracking for Your GBP Website Link',
-  description: 'UTM tagging for GBP: add utm_source, utm_medium, utm_campaign to your Google Business Profile website link. See GBP traffic in Google Analytics and prove ROI.',
-  keywords: ['utm tracking gbp', 'utm tagging for gbp', 'utm parameters google business profile', 'track gbp traffic', 'google business profile analytics', 'google analytics gbp'],
+  title: 'UTM Tagging for GBP: Track Your Google Business Profile Website Link',
+  description: 'Exact UTM parameters for your Google Business Profile website link (utm_source, utm_medium, utm_campaign). See GBP traffic in Google Analytics instead of "google / organic."',
+  keywords: ['utm tagging for gbp', 'google business profile utm parameters website link tracking', 'utm tracking gbp', 'utm parameters google business profile', 'track gbp traffic', 'google business profile analytics', 'google analytics gbp'],
   openGraph: {
-    title: 'How to Use UTM Tracking for Your GBP Website Link',
-    description: 'Add UTM parameters to your GBP website link. See GBP traffic in Google Analytics and prove local SEO ROI.',
+    title: 'UTM Tagging for GBP: Track Your Google Business Profile Website Link',
+    description: 'Exact UTM parameters for your Google Business Profile website link (utm_source, utm_medium, utm_campaign). See GBP traffic in Google Analytics instead of "google / organic."',
     url: '/resources/how-to-use-utm-tracking-for-gbp',
     siteName: 'MyGoProfile',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Use UTM Tracking for Your GBP Website Link',
-    description: 'UTM tagging for GBP: see your profile traffic in Google Analytics and prove ROI.',
+    title: 'UTM Tagging for GBP: Track Your Google Business Profile Website Link',
+    description: 'Exact UTM parameters for your Google Business Profile website link (utm_source, utm_medium, utm_campaign). See GBP traffic in Google Analytics instead of "google / organic."',
     images: [imageUrl],
   },
 }
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: 'How to Use UTM Tracking for Your GBP Website Link',
-  description: 'UTM tagging for GBP: add utm_source, utm_medium, utm_campaign to your Google Business Profile website link. See GBP traffic in Google Analytics and prove ROI.',
+  headline: 'UTM Tagging for GBP: Track Your Google Business Profile Website Link',
+  description: 'Exact UTM parameters for your Google Business Profile website link (utm_source, utm_medium, utm_campaign). See GBP traffic in Google Analytics instead of "google / organic."',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -208,7 +208,7 @@ export default function BlogPost() {
                 className="mb-8"
             />
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">How to Use UTM Tracking for Your GBP Website Link</h1>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">UTM Tagging for GBP: Track Your Google Business Profile Website Link</h1>
             <p className="lead mt-4 text-xl text-muted-foreground">Stop guessing where your website traffic comes from. This guide shows you exactly how to tag your Google Business Profile links to see their true impact in Google Analytics.</p>
           </div>
         </div>

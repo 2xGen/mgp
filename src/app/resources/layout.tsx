@@ -1,15 +1,28 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'GBP Management Guides – Fix Poor Google Business Profile',
+  title: 'GBP Management Guides 2026 – Google Business Profile Optimization & AI',
   description:
-    'Fix poor GBP management with free guides: optimization, AI review replies, local SEO, and multi-location. Step-by-step Google Business Profile advice that gets you more customers.',
+    'Free GBP management guides: best time to post on Google Business Profile, does responding to reviews help SEO, GBP optimization 2026, categories, photos, UTM tagging, and multi-location management.',
+  keywords: [
+    'GBP management',
+    'GBP optimization',
+    'google business profile guides',
+    'best time to post on google business profile',
+    'does responding to reviews help seo',
+    'google business profile mistakes',
+    'gbp guide 2026',
+  ],
+  alternates: {
+    canonical: 'https://mygoprofile.com/resources',
+  },
   openGraph: {
-    title: 'GBP Management Guides – Fix Poor Google Business Profile',
+    title: 'GBP Management Guides 2026 – Optimization, Reviews & AI',
     description:
-      'Free guides to fix poor GBP management: optimization, AI reviews, local SEO. Practical Google Business Profile advice.',
+      'Practical Google Business Profile guides: posting times, review replies & SEO, categories, photos, near me optimization, and multi-location GBP management.',
     url: 'https://mygoprofile.com/resources',
     siteName: 'MyGoProfile',
+    type: 'website',
   },
 };
 

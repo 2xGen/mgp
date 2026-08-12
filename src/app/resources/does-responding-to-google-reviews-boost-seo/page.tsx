@@ -13,12 +13,12 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 const imageUrl = "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/public/MGP/Does%20Responding%20to%20Google%20Reviews%20Boost%20Your%20Local%20SEO.jpg";
 
 export const metadata: Metadata = {
-  title: 'Does Responding to Google Reviews Help SEO? Yes – Here’s the Data',
-  description: 'Yes. Google says responding to reviews helps local SEO and visibility. See what the data shows and how to reply so you rank higher and get more customers.',
-  keywords: ['does responding to reviews help seo', 'do google reviews help seo', 'replying to google reviews', 'local SEO', 'review response', 'boost local ranking'],
+  title: 'Does Responding to Google Reviews Help SEO? Yes — Here\u2019s Why',
+  description: 'Yes. Responding to Google reviews helps local SEO and visibility. Google confirms it, and replies boost trust, review volume, and engagement signals. See how (and how to reply).',
+  keywords: ['does responding to reviews help seo', 'does responding to google reviews help seo', 'does replying to google reviews help seo', 'does replying to reviews help seo', 'do google reviews help seo', 'replying to google reviews', 'local SEO', 'review response', 'boost local ranking'],
   openGraph: {
-    title: 'Does Responding to Google Reviews Help SEO? Yes – Here’s the Data',
-    description: 'Yes. Google confirms responding to reviews helps local SEO. See the data and how to reply effectively.',
+    title: 'Does Responding to Google Reviews Help SEO? Yes — Here\u2019s Why',
+    description: 'Yes. Responding to Google reviews helps local SEO and visibility. Google confirms it, and replies boost trust, review volume, and engagement signals. See how (and how to reply).',
     url: '/resources/does-responding-to-google-reviews-boost-seo',
     siteName: 'MyGoProfile',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Does Responding to Google Reviews Help SEO? Yes – Here’s the Data',
-    description: 'Yes. Google confirms responding to reviews helps local SEO. See the data.',
+    title: 'Does Responding to Google Reviews Help SEO? Yes — Here\u2019s Why',
+    description: 'Yes. Responding to Google reviews helps local SEO and visibility. Google confirms it, and replies boost trust, review volume, and engagement signals. See how (and how to reply).',
     images: [imageUrl],
   },
 }
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: 'Does Responding to Google Reviews Boost Your Local SEO?',
-  description: 'Uncover the truth about how replying to customer reviews impacts your local search rankings and why engagement is a key signal for Google.',
+  headline: 'Does Responding to Google Reviews Help SEO?',
+  description: 'Yes. Responding to Google reviews helps local SEO and visibility. Google confirms it, and replies boost trust, review volume, and engagement signals. See how (and how to reply).',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -212,7 +212,7 @@ export default function BlogPostPage2() {
                 className="mb-8"
             />
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">Does Responding to Google Reviews Boost Your Local SEO?</h1>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">Does Responding to Google Reviews Help SEO?</h1>
             <p className="lead mt-4 text-xl text-muted-foreground">It’s a question every local business owner asks: Is it really worth my time to reply to every single Google review? Does it actually help me rank higher? The short answer is a resounding <strong className="text-primary">yes</strong>.</p>
           </div>
         </div>

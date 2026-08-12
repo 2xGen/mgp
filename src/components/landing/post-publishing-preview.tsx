@@ -43,46 +43,49 @@ export default function PostPublishingPreview() {
   }
 
   return (
-    <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2 lg:gap-20">
-        <div className="flex flex-col items-start gap-6 md:order-2">
+    <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 lg:gap-16">
+        <div className="flex flex-col items-start gap-4">
             <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
                 Stay Fresh & Relevant
             </div>
             <h2 className="font-headline text-3xl font-semibold tracking-tight md:text-4xl">
-                Publish Posts <span className="bg-gradient-brand animate-gradient-flow bg-[length:400%_400%] bg-clip-text text-transparent">Directly to Google</span>
+                AI drafts posts —{' '}
+                <span className="bg-gradient-brand animate-gradient-flow bg-[length:400%_400%] bg-clip-text text-transparent">
+                  you publish to Google
+                </span>
             </h2>
             <p className="text-lg text-muted-foreground">
-                Keep your customers in the loop and your profile active. Create and publish announcements, offers, and events directly from our dashboard, ensuring your business always looks current and engaging on Google Search and Maps.
+                Keep the profile active without staring at a blank box. Draft with AI, add a photo, publish offers and events straight to Search and Maps.
             </p>
              <ul className="space-y-3 text-muted-foreground">
                 <li className="flex items-start gap-3">
-                    <div className="grid h-8 w-8 place-items-center rounded-full bg-brand-green/10 text-brand-green flex-shrink-0">
+                    <div className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-full bg-brand-green/10 text-brand-green">
                        <Check className="h-5 w-5" />
                     </div>
-                    <span className="pt-1">Announce offers, events, or news in seconds.</span>
+                    <span className="pt-1">AI-written announcements, offers, and events.</span>
                 </li>
                  <li className="flex items-start gap-3">
-                    <div className="grid h-8 w-8 place-items-center rounded-full bg-brand-green/10 text-brand-green flex-shrink-0">
+                    <div className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-full bg-brand-green/10 text-brand-green">
                        <Check className="h-5 w-5" />
                     </div>
-                    <span className="pt-1">Boost your local SEO by keeping your profile active.</span>
+                    <span className="pt-1">Publish with photos so your profile stays fresh.</span>
                 </li>
                  <li className="flex items-start gap-3">
-                    <div className="grid h-8 w-8 place-items-center rounded-full bg-brand-green/10 text-brand-green flex-shrink-0">
+                    <div className="grid h-8 w-8 flex-shrink-0 place-items-center rounded-full bg-brand-green/10 text-brand-green">
                        <Check className="h-5 w-5" />
                     </div>
-                    <span className="pt-1">Schedule posts in advance (coming soon!).</span>
+                    <span className="pt-1">Weekly recurring event posts when you want autopilot.</span>
                 </li>
               </ul>
-              <Link href="/pricing" className="mt-4 w-full">
-                <Button size="lg" variant="outline" className="w-full">
-                    Get Started for Free
+              <Link href="/login" className="mt-2">
+                <Button size="lg" variant="outline">
+                    Start free trial
                     <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
             </Link>
         </div>
-        <div className="shadow-2xl rounded-xl md:order-1">
-             <div className="flex flex-col gap-6">
+        <div className="min-w-0">
+             <div className="flex flex-col gap-4">
                 <StatusCard isPosted={isPosted} />
                 <Card className="bg-card">
                     <CardHeader>

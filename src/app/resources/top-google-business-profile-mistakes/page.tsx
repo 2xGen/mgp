@@ -13,12 +13,12 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 const imageUrl = "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/public/MGP/Top%20Google%20Business%20Profile%20Mistakes%20That%20Are%20Costing%20You%20Customers.jpg";
 
 export const metadata: Metadata = {
-  title: 'Top Google Business Profile Mistakes That Are Costing You Customers',
-  description: 'Common Google Business Profile mistakes that hurt local search: inconsistent NAP, wrong categories, ignoring reviews, no photos. Fix them so your GBP appears in search again.',
-  keywords: ['google business profile mistakes', 'common google business profile mistakes', 'gbp not appearing in search', 'why is my Google Business not showing up', 'GBP not showing up', 'local SEO errors', 'fix my GBP'],
+  title: 'Google Business Profile Mistakes to Avoid (Common Ranking Killers)',
+  description: 'Common Google Business Profile mistakes that hurt rankings: inconsistent NAP, wrong categories, ignored reviews, stale photos. Fix them so your GBP shows up in search.',
+  keywords: ['google business profile mistakes to avoid', 'google my business mistakes', 'what are common google profile mistakes', 'google business profile mistakes', 'common google business profile mistakes', 'gbp not appearing in search', 'why is my Google Business not showing up', 'GBP not showing up', 'local SEO errors', 'fix my GBP'],
   openGraph: {
-    title: 'Top Google Business Profile Mistakes That Are Costing You Customers',
-    description: 'Common Google Business Profile mistakes that keep your GBP from appearing in search. Fix NAP, categories, reviews, and photos.',
+    title: 'Google Business Profile Mistakes to Avoid (Common Ranking Killers)',
+    description: 'Common Google Business Profile mistakes that hurt rankings: inconsistent NAP, wrong categories, ignored reviews, stale photos. Fix them so your GBP shows up in search.',
     url: '/resources/top-google-business-profile-mistakes',
     siteName: 'MyGoProfile',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Top Google Business Profile Mistakes That Are Costing You Customers',
-    description: 'Common GBP mistakes that keep your profile out of search. Fix them and get visible again.',
+    title: 'Google Business Profile Mistakes to Avoid (Common Ranking Killers)',
+    description: 'Common Google Business Profile mistakes that hurt rankings: inconsistent NAP, wrong categories, ignored reviews, stale photos. Fix them so your GBP shows up in search.',
     images: [imageUrl],
   },
 }
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: 'Top Google Business Profile Mistakes That Are Costing You Customers',
-  description: 'Common Google Business Profile mistakes that hurt local search: inconsistent NAP, wrong categories, ignoring reviews, no photos. Fix them so your GBP appears in search.',
+  headline: 'Common Google Business Profile Mistakes (And How to Fix Them)',
+  description: 'Common Google Business Profile mistakes that hurt rankings: inconsistent NAP, wrong categories, ignored reviews, stale photos. Fix them so your GBP shows up in search.',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -212,7 +212,7 @@ export default function BlogPostPage3() {
                 className="mb-8"
             />
             <div className="text-center">
-              <h1 className="!text-4xl !font-bold !tracking-tight md:!text-5xl">Top Google Business Profile Mistakes That Are Costing You Customers</h1>
+              <h1 className="!text-4xl !font-bold !tracking-tight md:!text-5xl">Common Google Business Profile Mistakes (And How to Fix Them)</h1>
               <p className="lead !text-xl !font-semibold mt-4">Wondering, "Why is my Google Business Profile not showing up?"</p>
             </div>
         </div>

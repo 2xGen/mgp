@@ -3,7 +3,6 @@
 
 import { useAuth } from "@/app/auth-provider";
 import { Button } from "@/components/ui/button";
-import { auth } from "@/lib/firebase";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter, usePathname } from "next/navigation";
 import Sidebar from "@/components/dashboard/sidebar";
@@ -11,7 +10,7 @@ import { DashboardProvider, useDashboard } from "./dashboard-provider";
 import { Logo } from "@/components/icons";
 import DashboardNav from "@/components/dashboard/dashboard-nav";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { PanelLeft, AlertTriangle, PartyPopper, Check, Loader2, Star } from "lucide-react";
+import { PanelLeft, AlertTriangle, PartyPopper, Loader2 } from "lucide-react";
 import AccountList from "@/components/dashboard/account-list";
 import { useEffect, useState } from "react";
 import {
@@ -35,68 +34,77 @@ import { isAfter } from "date-fns";
 import Link from "next/link";
 import { createCheckoutSession } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
+import {
+  PLAN_LABELS,
+  PLAN_BLURBS,
+  PLAN_PRICE_MONTHLY_EUR,
+  PLAN_PRICE_ANNUAL_EUR,
+  PLAN_PRICE_ANNUAL_TOTAL_EUR,
+  planScaleLine,
+  type PlanId,
+  type BillingInterval,
+} from "@/lib/plans";
+import { cn } from "@/lib/utils";
 
-function SessionExpirationHandler({ onForceLogout }: { onForceLogout: () => void }) {
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
+function SessionExpirationHandler() {
+    const [mode, setMode] = useState<"expired" | "connect" | null>(null);
     const { user } = useAuth();
-    const { detailsError } = useDashboard(); // Access error from dashboard context
+    const router = useRouter();
+    const { detailsError, setDetailsError } = useDashboard();
 
     useEffect(() => {
-        if (detailsError === 'SESSION_EXPIRED') {
-            setIsDialogOpen(true);
+        if (detailsError === "GOOGLE_NOT_CONNECTED") {
+            setMode("connect");
+        } else if (detailsError === "SESSION_EXPIRED") {
+            setMode("expired");
         }
     }, [detailsError]);
 
-    const handleLogin = () => {
-        setIsDialogOpen(false);
-        onForceLogout();
+    const handleConnect = () => {
+        setMode(null);
+        setDetailsError(null);
+        router.push("/connect-google");
     };
 
+    const displayName =
+      user?.user_metadata?.full_name ||
+      user?.user_metadata?.name ||
+      "";
+
     return (
-        <AlertDialog open={isDialogOpen}>
+        <AlertDialog open={mode !== null} onOpenChange={(open) => !open && setMode(null)}>
             <AlertDialogContent>
                 <AlertDialogHeader>
                      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100">
                         <AlertTriangle className="h-6 w-6 text-yellow-600" aria-hidden="true" />
                     </div>
-                    <AlertDialogTitle className="text-center">Welcome {user?.displayName || ''}</AlertDialogTitle>
+                    <AlertDialogTitle className="text-center">
+                      {mode === "connect"
+                        ? "Connect your Google Business Profile"
+                        : `Welcome ${displayName}`}
+                    </AlertDialogTitle>
                     <AlertDialogDescription className="text-center">
-                        Your session has expired. Please log in again to continue managing your profile.
+                        {mode === "connect"
+                          ? "You're signed in. Next, connect your Google Business Profile so we can load your locations and performance data."
+                          : "Your Google Business Profile connection expired. Reconnect to continue managing your profile."}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
-                <AlertDialogAction onClick={handleLogin} className="w-full">
-                    Log In Again
+                <AlertDialogAction onClick={handleConnect} className="w-full">
+                    {mode === "connect" ? "Connect Google Business Profile" : "Reconnect Google"}
                 </AlertDialogAction>
             </AlertDialogContent>
         </AlertDialog>
     );
 }
 
-const starterFeatures = [
-    "1 Location",
-    "1 Team Member",
-    "AI-Powered Review Replies",
-];
-
-const growthFeatures = [
-    "3 Locations",
-    "3 Team Members",
-    "Multi-Location Leaderboard",
-];
-
-const enterpriseFeatures = [
-    "Up to 10 Locations",
-    "Up to 5 Team Members",
-    "All Growth Features",
-    "Early Access to New Features"
-];
-
+const PLANS: PlanId[] = ["starter", "growth", "enterprise"];
 
 function TrialExpirationHandler() {
     const { user, subscription } = useAuth();
     const pathname = usePathname();
     const [isExpired, setIsExpired] = useState(false);
     const [isSubscribing, setIsSubscribing] = useState<string | null>(null);
+    const [billingInterval, setBillingInterval] = useState<BillingInterval>("annual");
     const { toast } = useToast();
 
     useEffect(() => {
@@ -115,11 +123,11 @@ function TrialExpirationHandler() {
         }
     }, [subscription, pathname]);
 
-    const handleSubscribe = async (planId: 'starter' | 'growth' | 'enterprise') => {
+    const handleSubscribe = async (planId: PlanId) => {
         if (!user) return;
         setIsSubscribing(planId);
 
-        const result = await createCheckoutSession(user.uid, planId);
+        const result = await createCheckoutSession(user.id, planId, billingInterval);
         if (result.error || !result.url) {
             toast({ title: "Error", description: result.error || "Could not create checkout session.", variant: "destructive" });
             setIsSubscribing(null);
@@ -141,90 +149,81 @@ function TrialExpirationHandler() {
                     </div>
                     <DialogTitle className="text-center">Your Free Trial Has Ended</DialogTitle>
                     <DialogDescription className="text-center max-w-lg mx-auto">
-                        Thanks for giving MyGoProfile a try! To continue using our powerful AI tools and analytics, please choose a plan below.
+                        Thanks for giving MyGoProfile a try! Choose a plan to keep using AI tools and analytics.
                     </DialogDescription>
                 </DialogHeader>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 py-8">
-                     <Card>
-                        <CardHeader>
-                            <CardTitle className="font-headline text-2xl">Starter</CardTitle>
-                            <CardDescription>For single-location businesses.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-3xl font-bold">$29</span>
+                <div className="flex justify-center">
+                  <div className="inline-flex items-center gap-1 rounded-full border bg-background p-1">
+                    <button
+                      type="button"
+                      onClick={() => setBillingInterval("monthly")}
+                      className={cn(
+                        "rounded-full px-3 py-1 text-xs font-medium transition-colors",
+                        billingInterval === "monthly"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Monthly
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBillingInterval("annual")}
+                      className={cn(
+                        "rounded-full px-3 py-1 text-xs font-medium transition-colors",
+                        billingInterval === "annual"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      Annual · 2 months free
+                    </button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-6 py-6 md:grid-cols-3">
+                    {PLANS.map((planId) => {
+                      const popular = planId === "growth";
+                      const price =
+                        billingInterval === "annual"
+                          ? PLAN_PRICE_ANNUAL_EUR[planId]
+                          : PLAN_PRICE_MONTHLY_EUR[planId];
+                      return (
+                        <Card key={planId} className={cn(popular && "border-primary shadow-lg")}>
+                          <CardHeader>
+                            <CardTitle className="font-headline text-2xl">{PLAN_LABELS[planId]}</CardTitle>
+                            <CardDescription>{PLAN_BLURBS[planId]}</CardDescription>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <div>
+                              <div className="flex items-baseline gap-2">
+                                <span className="text-3xl font-bold">€{price}</span>
                                 <span className="text-muted-foreground">/ month</span>
+                              </div>
+                              <p className="mt-1 text-xs text-muted-foreground">
+                                {billingInterval === "annual"
+                                  ? `€${PLAN_PRICE_ANNUAL_TOTAL_EUR[planId]}/year · billed yearly`
+                                  : `or €${PLAN_PRICE_ANNUAL_TOTAL_EUR[planId]}/year`}
+                              </p>
+                              <p className="mt-2 text-sm font-medium">{planScaleLine(planId)}</p>
                             </div>
-                            <ul className="space-y-3">
-                                {starterFeatures.map(feature => (
-                                    <li key={feature} className="flex items-center gap-3">
-                                        <Check className="h-5 w-5 text-brand-green" />
-                                        <span>{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                        <CardFooter>
-                            <Button className="w-full" size="lg" onClick={() => handleSubscribe('starter')} disabled={!!isSubscribing}>
-                                {isSubscribing === 'starter' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                Subscribe
+                          </CardContent>
+                          <CardFooter>
+                            <Button
+                              className="w-full"
+                              size="lg"
+                              variant={popular ? "default" : "outline"}
+                              onClick={() => handleSubscribe(planId)}
+                              disabled={!!isSubscribing}
+                            >
+                              {isSubscribing === planId ? (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              ) : null}
+                              Subscribe
                             </Button>
-                        </CardFooter>
-                    </Card>
-
-                    <Card className="border-primary shadow-lg">
-                        <CardHeader>
-                            <CardTitle className="font-headline text-2xl">Growth</CardTitle>
-                            <CardDescription>For agencies & multi-location businesses.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-3xl font-bold">$49</span>
-                                <span className="text-muted-foreground">/ month</span>
-                            </div>
-                            <ul className="space-y-3">
-                                {growthFeatures.map(feature => (
-                                    <li key={feature} className="flex items-center gap-3">
-                                        <Check className="h-5 w-5 text-brand-green" />
-                                        <span>{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                        <CardFooter>
-                           <Button className="w-full" size="lg" onClick={() => handleSubscribe('growth')} disabled={!!isSubscribing}>
-                                {isSubscribing === 'growth' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                Subscribe
-                            </Button>
-                        </CardFooter>
-                    </Card>
-
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="font-headline text-2xl">Enterprise</CardTitle>
-                            <CardDescription>For businesses ready to scale.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-3xl font-bold">$99</span>
-                                <span className="text-muted-foreground">/ month</span>
-                            </div>
-                            <ul className="space-y-3">
-                                {enterpriseFeatures.map(feature => (
-                                    <li key={feature} className="flex items-center gap-3">
-                                        <Star className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-                                        <span className="font-medium">{feature}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                        <CardFooter>
-                           <Button className="w-full" size="lg" onClick={() => handleSubscribe('enterprise')} disabled={!!isSubscribing}>
-                                {isSubscribing === 'enterprise' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                                Subscribe
-                            </Button>
-                        </CardFooter>
-                    </Card>
+                          </CardFooter>
+                        </Card>
+                      );
+                    })}
                 </div>
                  <DialogFooter className="sm:justify-center">
                     <Button type="button" variant="ghost" onClick={() => setIsExpired(false)}>
@@ -242,11 +241,18 @@ export default function DashboardLayout({
 }: {
     children: React.ReactNode
 }) {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading, signOut } = useAuth();
   const router = useRouter();
 
+  const displayName =
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email ||
+    "";
+  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined;
+
   const handleLogout = async () => {
-    await auth.signOut();
+    await signOut();
     router.push("/login");
   };
   
@@ -280,11 +286,11 @@ export default function DashboardLayout({
                         {!isLoading && user && (
                             <div className="flex items-center gap-2">
                                 <Avatar className="h-8 w-8">
-                                {user.photoURL && <AvatarImage src={user.photoURL} alt={user.displayName || ""} />}
-                                <AvatarFallback>{user.displayName?.charAt(0)}</AvatarFallback>
+                                {avatarUrl && <AvatarImage src={avatarUrl} alt={displayName} />}
+                                <AvatarFallback>{displayName?.charAt(0)}</AvatarFallback>
                                 </Avatar>
                                 <div className="flex-col hidden sm:flex">
-                                <span className="font-semibold">{user.displayName}</span>
+                                <span className="font-semibold">{displayName}</span>
                                 </div>
                             </div>
                         )}
@@ -300,7 +306,7 @@ export default function DashboardLayout({
                 </div>
             </div>
         </div>
-        <SessionExpirationHandler onForceLogout={handleLogout} />
+        <SessionExpirationHandler />
         <TrialExpirationHandler />
     </DashboardProvider>
   )

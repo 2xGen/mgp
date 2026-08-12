@@ -77,7 +77,8 @@ export default function DashboardPage() {
   }
 
   const renderContent = () => {
-    if (isDetailsLoading) {
+    // Keep showing cached dashboard while a background refresh runs.
+    if (isDetailsLoading && !selectedLocation && !allLocationsData) {
       return (
         <div className="flex flex-1 items-center justify-center">
             <div className="flex items-center gap-2 text-muted-foreground">
@@ -88,7 +89,7 @@ export default function DashboardPage() {
       );
     }
 
-    if (detailsError && detailsError !== 'SESSION_EXPIRED') {
+    if (detailsError && detailsError !== 'SESSION_EXPIRED' && detailsError !== 'GOOGLE_NOT_CONNECTED') {
       return (
         <div className="flex flex-1 items-center justify-center">
             <div className="text-center text-destructive">
@@ -115,9 +116,9 @@ export default function DashboardPage() {
                 <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-primary/10 mb-4">
                     <Library className="h-6 w-6 text-primary" />
                 </div>
-                <CardTitle>Select a Location</CardTitle>
+                <CardTitle>Select a location</CardTitle>
                 <CardDescription>
-                    Choose a specific location from the sidebar to view its dashboard, or use the "Load All Locations" button to see an aggregated overview.
+                    Pick a location in the sidebar to open its dashboard.
                 </CardDescription>
             </CardHeader>
           </Card>

@@ -98,8 +98,8 @@ export default function ManageTeamPage() {
     try {
         const [accountsResult, invitesResult, managedLocsResult] = await Promise.all([
             fetchAccounts(),
-            getTeamInvites(user.uid),
-            getManagedLocations(user.uid)
+            getTeamInvites(user.id),
+            getManagedLocations(user.id)
         ]);
 
         if (accountsResult.error) throw new Error(accountsResult.error);
@@ -217,7 +217,7 @@ export default function ManageTeamPage() {
 
   const handleInvitesChange = () => {
       if(user) {
-        getTeamInvites(user.uid).then(res => {
+        getTeamInvites(user.id).then(res => {
             if (res.data) setTeamInvites(res.data);
         });
       }
@@ -225,7 +225,7 @@ export default function ManageTeamPage() {
 
   const handleRemoveInvite = async (inviteId: string) => {
     if (!user) return;
-    const result = await removeTeamInvite(user.uid, inviteId);
+    const result = await removeTeamInvite(user.id, inviteId);
     if (result.error) {
         toast({ title: "Error", description: result.error, variant: "destructive" });
     } else {

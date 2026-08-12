@@ -13,12 +13,12 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 const imageUrl = "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/Future%20of%20Local%20Search.png";
 
 export const metadata: Metadata = {
-  title: 'Future of Local Search: How Google’s AI Overviews Will Impact Businesses',
-  description: 'Google’s new AI Overviews are changing search. Learn how this will affect your local business and why a fully optimized Google Business Profile is more important than ever.',
-  keywords: ['Google AI Overviews', 'AI Overviews local business', 'future of local search', 'GBP for AI search'],
+  title: 'AI Overviews & Local SEO: How Google\u2019s AI Impacts Local Search',
+  description: 'AI Overviews local SEO impact explained: why your Google Business Profile feeds Google\u2019s AI answers, and how to win visibility when AI Overviews change local search behavior.',
+  keywords: ['ai overviews local seo impact', 'googles ai overviews and local seo', 'how ai overviews change legal local search behavior', 'Google AI Overviews', 'AI Overviews local business', 'future of local search', 'GBP for AI search'],
   openGraph: {
-    title: 'Future of Local Search: How Google’s AI Overviews Will Impact Businesses',
-    description: 'Learn how Google\'s new AI Overviews will affect your local business and why an optimized GBP is more important than ever.',
+    title: 'AI Overviews & Local SEO: How Google\u2019s AI Impacts Local Search',
+    description: 'AI Overviews local SEO impact explained: why your Google Business Profile feeds Google\u2019s AI answers, and how to win visibility when AI Overviews change local search behavior.',
     url: '/resources/future-of-local-search-with-ai-overviews',
     siteName: 'MyGoProfile',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Future of Local Search: How Google’s AI Overviews Will Impact Businesses',
-    description: 'Learn how Google\'s new AI Overviews will affect your local business and why an optimized GBP is more important than ever.',
+    title: 'AI Overviews & Local SEO: How Google\u2019s AI Impacts Local Search',
+    description: 'AI Overviews local SEO impact explained: why your Google Business Profile feeds Google\u2019s AI answers, and how to win visibility when AI Overviews change local search behavior.',
     images: [imageUrl],
   },
 }
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: 'Future of Local Search: How Google’s AI Overviews Will Impact Businesses',
-  description: 'Google’s new AI Overviews are changing search. Learn how this will affect your local business and why a fully optimized Google Business Profile is more important than ever.',
+  headline: 'How Google\u2019s AI Overviews Impact Local SEO',
+  description: 'AI Overviews local SEO impact explained: why your Google Business Profile feeds Google\u2019s AI answers, and how to win visibility when AI Overviews change local search behavior.',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -73,7 +73,7 @@ const faqJsonLd = {
       name: 'What are Google AI Overviews and how do they affect local businesses?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'AI Overviews are AI-generated answers at the top of Google search. For local queries, Google’s AI often pulls from your Google Business Profile—description, services, reviews, replies, photos, posts, Q&A. If your profile is incomplete or negative, you may be left out or summarized poorly. A complete, active, well-reviewed GBP helps you get featured in the overview.',
+        text: 'AI Overviews are AI-generated answers at the top of Google search. For local queries, Google\u2019s AI often pulls from your Google Business Profile—description, services, reviews, replies, photos, posts, Q&A. If your profile is incomplete or negative, you may be left out or summarized poorly. A complete, active, well-reviewed GBP helps you get featured in the overview.',
       },
     },
     {
@@ -81,7 +81,7 @@ const faqJsonLd = {
       name: 'How do I get my business in Google AI Overviews?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Fill every field on your GBP, get and respond to reviews, publish Google Posts and new photos regularly, and keep your Q&A updated. The AI favors businesses that look current, complete, and trusted. There’s no direct “submit to AI Overviews” button; optimization and consistency are what matter.',
+        text: 'Fill every field on your GBP, get and respond to reviews, publish Google Posts and new photos regularly, and keep your Q&A updated. The AI favors businesses that look current, complete, and trusted. There\u2019s no direct "submit to AI Overviews" button; optimization and consistency are what matter.',
       },
     },
   ],
@@ -184,15 +184,15 @@ export default function BlogPost() {
                 className="mb-8"
             />
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">The Future of Local Search: How Google’s AI Overviews Will Impact Businesses</h1>
-            <p className="lead mt-4 text-xl text-muted-foreground">Google is rolling out AI-generated answers at the top of its search results. Here’s what it means for your local business and why your GBP is now more critical than ever.</p>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">How Google's AI Overviews Impact Local SEO</h1>
+            <p className="lead mt-4 text-xl text-muted-foreground">Google is rolling out AI-generated answers at the top of its search results. Here's what it means for your local business and why your GBP is now more critical than ever.</p>
           </div>
         </div>
         <article className="container max-w-screen-md prose prose-lg prose-blue dark:prose-invert mt-12">
             <div className="relative mb-12 h-64 w-full overflow-hidden rounded-xl md:h-80">
                 <Image
                     src={imageUrl}
-                    alt="Future of Local Search: How Google’s AI Overviews Will Impact Businesses"
+                    alt="How Google's AI Overviews Impact Local SEO"
                     fill
                     className="object-cover"
                     priority

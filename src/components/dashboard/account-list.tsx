@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { fetchAccounts, fetchLocations, getManagedLocations, getTeamInvites } from "@/app/actions";
 import { Loader2, Terminal, Info } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -11,6 +11,13 @@ import { useAuth } from "@/app/auth-provider";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import type { ManagedLocation } from "@/app/dashboard/select-locations/page";
+import {
+  getCachedSidebar,
+  peekCachedSidebar,
+  setCachedSidebar,
+  isSidebarCacheFresh,
+  withSidebarInflight,
+} from "@/lib/dashboard-cache";
 
 
 interface Location extends ManagedLocation {
@@ -18,14 +25,35 @@ interface Location extends ManagedLocation {
   account: { name: string };
 }
 
+type SidebarCachePayload = {
+  locations: Location[];
+};
+
 export default function AccountList() {
   const { user, role, teamOwnerId } = useAuth();
-  const [managedLocationsDetails, setManagedLocationsDetails] = useState<Location[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    setAccountId,
+    setSelectedLocationName,
+    selectedLocationName,
+    setDetailsError,
+    accountId,
+    setManagedLocationCount,
+  } = useDashboard();
+  const router = useRouter();
+
+  const accountIdRef = useRef(accountId);
+  const selectedLocationNameRef = useRef(selectedLocationName);
+  accountIdRef.current = accountId;
+  selectedLocationNameRef.current = selectedLocationName;
+
+  const peeked = user ? peekCachedSidebar<SidebarCachePayload>(user.id) : null;
+  const [managedLocationsDetails, setManagedLocationsDetails] = useState<Location[]>(
+    peeked?.locations ?? []
+  );
+  const [isLoading, setIsLoading] = useState(!peeked?.locations?.length);
   const [error, setError] = useState<string | null>(null);
   const [noGoogleAccounts, setNoGoogleAccounts] = useState(false);
-  const { setAccountId, setSelectedLocationName, selectedLocationName, setDetailsError, accountId, setManagedLocationCount } = useDashboard();
-  const router = useRouter();
+  const didInit = useRef(false);
 
   const colors = [
     'border-blue-300',
@@ -36,120 +64,155 @@ export default function AccountList() {
     'border-pink-300',
   ];
 
+  const applyLocations = useCallback((relevantLocations: Location[]) => {
+    setManagedLocationsDetails(relevantLocations);
+    setManagedLocationCount(relevantLocations.length);
+    if (relevantLocations.length === 0) return;
+    const first = relevantLocations[0];
+    if (!accountIdRef.current) setAccountId(first.account.name);
+    if (!selectedLocationNameRef.current) setSelectedLocationName(first.locationName);
+  }, [setAccountId, setSelectedLocationName, setManagedLocationCount]);
+
   const getLocations = useCallback(async () => {
-    if (!user || !role) return; // Wait until user and role are loaded
-    setIsLoading(true);
-    setError(null);
-    setDetailsError(null);
-    setNoGoogleAccounts(false);
-    
-    try {
-      let ownerId = role === 'teamMember' && teamOwnerId ? teamOwnerId : user.uid;
+    if (!user || !role) return;
 
-      const accountsResult = await fetchAccounts();
-      if (accountsResult.error) {
-        setError(accountsResult.error);
-        if (accountsResult.error === 'SESSION_EXPIRED') {
-            setDetailsError('SESSION_EXPIRED');
+    return withSidebarInflight(user.id, async () => {
+      // Another mount may have filled the cache while we waited on the lock.
+      if (isSidebarCacheFresh(user.id)) {
+        const hit = getCachedSidebar<SidebarCachePayload>(user.id);
+        if (hit?.locations) {
+          applyLocations(hit.locations);
+          setIsLoading(false);
+          return hit;
         }
-        setIsLoading(false);
-        return;
       }
 
-      if (!accountsResult.accounts || accountsResult.accounts.length === 0) {
-        setNoGoogleAccounts(true);
-        setManagedLocationsDetails([]);
-        setIsLoading(false);
-        return;
-      }
+      setError(null);
+      setDetailsError(null);
 
-      const managedResult = await getManagedLocations(ownerId);
-      if (managedResult.error) {
+      try {
+        const ownerId = role === 'teamMember' && teamOwnerId ? teamOwnerId : user.id;
+
+        const accountsResult = await fetchAccounts();
+        if (accountsResult.error) {
+          setError(accountsResult.error);
+          if (accountsResult.error === 'SESSION_EXPIRED' || accountsResult.error === 'GOOGLE_NOT_CONNECTED') {
+            setDetailsError(accountsResult.error);
+          }
+          setIsLoading(false);
+          return null;
+        }
+
+        if (!accountsResult.accounts || accountsResult.accounts.length === 0) {
+          setNoGoogleAccounts(true);
+          applyLocations([]);
+          setIsLoading(false);
+          return { locations: [] };
+        }
+
+        const managedResult = await getManagedLocations(ownerId);
+        if (managedResult.error) {
           setError(managedResult.error);
           setIsLoading(false);
-          return;
-      }
-      
-      const managedLocationsMap = new Map<string, ManagedLocation>();
-      (managedResult.locations || []).forEach(l => managedLocationsMap.set(l.locationName, l));
-      
-      if (managedLocationsMap.size === 0 && role === 'owner') {
-        setManagedLocationsDetails([]);
-        setIsLoading(false);
-        return;
-      }
-      
-      if (accountsResult.accounts && accountsResult.accounts.length > 0) {
+          return null;
+        }
+
+        const managedLocationsMap = new Map<string, ManagedLocation>();
+        (managedResult.locations || []).forEach((l) => managedLocationsMap.set(l.locationName, l));
+
+        if (managedLocationsMap.size === 0 && role === 'owner') {
+          const empty = { locations: [] as Location[] };
+          setCachedSidebar(user.id, empty);
+          applyLocations([]);
+          setIsLoading(false);
+          return empty;
+        }
+
         const locationPromises = accountsResult.accounts.map(async (account: { name: string }) => {
           const locs = await fetchLocations(account.name);
           return (locs.locations || []).map((l: any) => ({ ...l, account }));
         });
-        const locationsByAccount = await Promise.all(locationPromises);
-        const allApiLocations = locationsByAccount.flat();
-        
+        const allApiLocations = (await Promise.all(locationPromises)).flat();
+
         let relevantLocations: Location[] = [];
 
         if (role === 'teamMember') {
-            const teamInvitesResult = await getTeamInvites(ownerId);
-            if (teamInvitesResult.error) {
-              setError(teamInvitesResult.error);
-              return;
-            }
-            
-            // Find the claimed invite for the current user
-            const currentUserInvite = teamInvitesResult.data?.find(inv => inv.status === 'claimed' && inv.claimedBy === user.uid);
-            const assignedLocationNames = currentUserInvite?.locations || [];
+          const teamInvitesResult = await getTeamInvites(ownerId);
+          if (teamInvitesResult.error) {
+            setError(teamInvitesResult.error);
+            setIsLoading(false);
+            return null;
+          }
 
-             relevantLocations = allApiLocations
-                .filter(apiLoc => assignedLocationNames.includes(apiLoc.name))
-                .map(apiLoc => {
-                    // For team members, we find the corresponding emoji/date info from the owner's managed locations
-                    const dbData = managedLocationsMap.get(apiLoc.name) || { locationName: apiLoc.name, dateAdded: new Date().toISOString() };
-                    return { ...apiLoc, ...dbData };
-                });
-        } else { // 'owner'
-             relevantLocations = allApiLocations
-                .filter(apiLoc => managedLocationsMap.has(apiLoc.name))
-                .map(apiLoc => {
-                    const dbData = managedLocationsMap.get(apiLoc.name)!;
-                    return { ...apiLoc, ...dbData };
-                });
-        }
-        setManagedLocationsDetails(relevantLocations);
-        setManagedLocationCount(relevantLocations.length);
-        
-        // If no account is selected yet, select the first one.
-        if (relevantLocations.length > 0 && !accountId) {
-            setAccountId(relevantLocations[0].account.name);
+          const currentUserInvite = teamInvitesResult.data?.find(
+            (inv) => inv.status === 'claimed' && inv.claimedBy === user.id
+          );
+          const assignedLocationNames = currentUserInvite?.locations || [];
+
+          relevantLocations = allApiLocations
+            .filter((apiLoc) => assignedLocationNames.includes(apiLoc.name))
+            .map((apiLoc) => {
+              const dbData =
+                managedLocationsMap.get(apiLoc.name) || {
+                  locationName: apiLoc.name,
+                  dateAdded: new Date().toISOString(),
+                };
+              return { ...apiLoc, ...dbData };
+            });
+        } else {
+          relevantLocations = allApiLocations
+            .filter((apiLoc) => managedLocationsMap.has(apiLoc.name))
+            .map((apiLoc) => {
+              const dbData = managedLocationsMap.get(apiLoc.name)!;
+              return { ...apiLoc, ...dbData };
+            });
         }
 
-      } else {
-          setManagedLocationsDetails([]);
-          setManagedLocationCount(0);
+        const payload = { locations: relevantLocations };
+        setCachedSidebar(user.id, payload);
+        applyLocations(relevantLocations);
+        setIsLoading(false);
+        return payload;
+      } catch (e: any) {
+        setError(e.message || "Failed to fetch data.");
+        setIsLoading(false);
+        return null;
       }
-    } catch (e: any) {
-      const errorMessage = e.message || "Failed to fetch data.";
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user, role, teamOwnerId, setAccountId, setDetailsError, accountId, setManagedLocationCount]);
+    });
+  }, [user, role, teamOwnerId, setDetailsError, applyLocations]);
 
   useEffect(() => {
-    getLocations();
-  }, [getLocations]);
+    if (!user || !role || didInit.current) return;
+    didInit.current = true;
 
+    const fresh = getCachedSidebar<SidebarCachePayload>(user.id);
+    const any = peekCachedSidebar<SidebarCachePayload>(user.id);
+
+    if (fresh?.locations) {
+      applyLocations(fresh.locations);
+      setIsLoading(false);
+      return; // still fresh — do not hit Google again
+    }
+
+    if (any?.locations?.length) {
+      applyLocations(any.locations);
+      setIsLoading(false);
+      // Stale: soft refresh without spinner
+      void getLocations();
+      return;
+    }
+
+    void getLocations();
+  }, [user, role, getLocations, applyLocations]);
 
   const handleRowClick = (location: Location) => {
     setAccountId(location.account.name);
     setSelectedLocationName(location.locationName);
     router.push('/dashboard');
-  }
+  };
 
-  // If session is expired, the global handler in layout.tsx will take over.
-  // Don't render anything here to avoid showing confusing UI.
-  if (error === 'SESSION_EXPIRED') {
-      return null;
+  if (error === 'SESSION_EXPIRED' || error === 'GOOGLE_NOT_CONNECTED') {
+    return null;
   }
 
   return (
@@ -179,7 +242,8 @@ export default function AccountList() {
                     onClick={() => handleRowClick(location)}
                     className={cn(
                         "cursor-pointer border-l-4",
-                        colors[index % colors.length]
+                        colors[index % colors.length],
+                        selectedLocationName === location.locationName && "bg-muted"
                     )}
                     data-state={selectedLocationName === location.locationName ? 'selected' : ''}
                   >

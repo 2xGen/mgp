@@ -16,7 +16,12 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  /* config options here */
+  experimental: {
+    // Photo uploads used to send base64 through actions (hits default 1MB).
+    serverActions: {
+      bodySizeLimit: '6mb',
+    },
+  },
   typescript: {
     ignoreBuildErrors: true,
   },
@@ -64,12 +69,13 @@ const nextConfig: NextConfig = {
     ],
   },
   env: {
-    ADMIN_UID: process.env.ADMIN_UID,
+    ADMIN_EMAIL: process.env.ADMIN_EMAIL,
+    NEXT_PUBLIC_ADMIN_EMAIL: process.env.NEXT_PUBLIC_ADMIN_EMAIL,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-    STARTER_PLAN_PRICE_ID: process.env.STARTER_PLAN_PRICE_ID,
-    GROWTH_PLAN_PRICE_ID: process.env.GROWTH_PLAN_PRICE_ID,
-    ENTERPRISE_PLAN_PRICE_ID: process.env.ENTERPRISE_PLAN_PRICE_ID,
+    STRIPE_STARTER_PRICE_ID: process.env.STRIPE_STARTER_PRICE_ID,
+    STRIPE_GROWTH_PRICE_ID: process.env.STRIPE_GROWTH_PRICE_ID,
+    STRIPE_ENTERPRISE_PRICE_ID: process.env.STRIPE_ENTERPRISE_PRICE_ID,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
   },
 };

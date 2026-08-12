@@ -2,6 +2,7 @@
 import { Logo } from '@/components/icons';
 import Link from 'next/link';
 import CookieManager from '../cookie-manager';
+import SecurePayments from '@/components/landing/secure-payments';
 
 const popularGuides = [
   { label: 'Complete GBP optimization guide', href: '/resources/google-business-profile-optimization' },
@@ -66,11 +67,14 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className="mt-8 pt-6 border-t text-center text-sm text-muted-foreground">
-          Powered by{' '}
-          <Link href="/2xgen" className="font-semibold text-primary hover:underline">
-            2xGen
-          </Link>
+        <div className="mt-8 flex flex-col items-center gap-6 border-t pt-6">
+          <SecurePayments compact />
+          <p className="text-center text-sm text-muted-foreground">
+            Powered by{' '}
+            <Link href="/2xgen" className="font-semibold text-primary hover:underline">
+              2xGen
+            </Link>
+          </p>
         </div>
       </div>
     </footer>

@@ -13,12 +13,12 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 const imageUrl = "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/7%20Ways%20AI%20Can%20Improve%20Your%20Google%20Business%20Rankings.png";
 
 export const metadata: Metadata = {
-  title: '7 Ways AI Can Improve Your Google Business Rankings',
-  description: 'Seven practical ways AI can improve your GBP rankings: review replies, descriptions, posts, performance insights, profile completeness, photos, and competitor intel.',
+  title: 'AI for Google Business Profile: 7 Ways to Improve Rankings',
+  description: 'Practical AI for Google Business Profile rankings: 100% review replies, posts, descriptions, insights, completeness, photo SEO, and competitor intel.',
   keywords: ['AI improve GBP ranking', 'AI for local SEO', 'Google Business Profile AI', 'local SEO automation'],
   openGraph: {
-    title: '7 Ways AI Can Improve Your Google Business Rankings',
-    description: 'Review replies, descriptions, posts, insights, completeness, photos, competitors—seven ways AI helps your GBP rank.',
+    title: 'AI for Google Business Profile: 7 Ways to Improve Rankings',
+    description: 'Practical AI for Google Business Profile rankings: 100% review replies, posts, descriptions, insights, completeness, photo SEO, and competitor intel.',
     url: '/resources/7-ways-ai-can-improve-gbp-rankings',
     siteName: 'MyGoProfile',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '7 Ways AI Can Improve Your Google Business Rankings',
-    description: 'Seven ways AI helps: reviews, descriptions, posts, insights, completeness, photos, competitors.',
+    title: 'AI for Google Business Profile: 7 Ways to Improve Rankings',
+    description: 'Practical AI for Google Business Profile rankings: 100% review replies, posts, descriptions, insights, completeness, photo SEO, and competitor intel.',
     images: [imageUrl],
   },
 }
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: '7 Ways AI Can Improve Your Google Business Rankings',
-  description: 'Seven practical ways AI can improve GBP rankings: review replies, descriptions, posts, performance insights, profile completeness, photos, and competitor intel.',
+  headline: '7 Ways AI Can Improve Your Google Business Profile Rankings',
+  description: 'Practical AI for Google Business Profile rankings: 100% review replies, posts, descriptions, insights, completeness, photo SEO, and competitor intel.',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -184,7 +184,7 @@ export default function BlogPost() {
                 className="mb-8"
             />
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">7 Practical Ways AI Can Improve Your Google Business Rankings</h1>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">7 Ways AI Can Improve Your Google Business Profile Rankings</h1>
             <p className="lead mt-4 text-xl text-muted-foreground">AI isn't just a buzzword; it's a powerful tool that can directly impact your local SEO. Here are seven concrete ways AI helps you climb the rankings on Google.</p>
           </div>
         </div>

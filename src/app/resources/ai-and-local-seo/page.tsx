@@ -13,12 +13,12 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 const imageUrl = "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/public/MGP/AI%20and%20Local%20SEO.jpg";
 
 export const metadata: Metadata = {
-  title: 'AI for Local SEO: How AI Transforms Google Business Profile Management',
-  description: 'How AI helps with GBP management: draft review replies in seconds, turn Insights into plain-English recommendations, and keep your profile active without the grind.',
-  keywords: ['AI local SEO', 'AI for Google reviews', 'AI for small business marketing', 'Google Business Profile AI', 'local SEO automation'],
+  title: 'AI Local SEO for Google Business Profile (Practical Guide)',
+  description: 'AI local SEO optimization for Google Business Profile: AI review replies, performance summaries, and how Google Business Profile AI tools save time without replacing you.',
+  keywords: ['ai local seo optimization google business profile', 'google business profile ai', 'AI local SEO', 'AI for Google reviews', 'AI for small business marketing', 'Google Business Profile AI', 'local SEO automation'],
   openGraph: {
-    title: 'AI for Local SEO: How AI Transforms Google Business Profile Management',
-    description: 'AI that drafts review replies and turns GBP data into clear recommendations. Less grind, more consistency.',
+    title: 'AI Local SEO for Google Business Profile (Practical Guide)',
+    description: 'AI local SEO optimization for Google Business Profile: AI review replies, performance summaries, and how Google Business Profile AI tools save time without replacing you.',
     url: '/resources/ai-and-local-seo',
     siteName: 'MyGoProfile',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI for Local SEO: How AI Transforms Google Business Profile Management',
-    description: 'Draft review replies and get clear insights from your GBP data. Less grind, more consistency.',
+    title: 'AI Local SEO for Google Business Profile (Practical Guide)',
+    description: 'AI local SEO optimization for Google Business Profile: AI review replies, performance summaries, and how Google Business Profile AI tools save time without replacing you.',
     images: [imageUrl],
   },
 }
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: 'AI for Local SEO: How AI Transforms Google Business Profile Management',
-  description: 'How AI helps with GBP management: draft review replies, turn Insights into recommendations, and keep your profile active without the grind.',
+  headline: 'AI Local SEO Optimization for Google Business Profile',
+  description: 'AI local SEO optimization for Google Business Profile: AI review replies, performance summaries, and how Google Business Profile AI tools save time without replacing you.',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -220,7 +220,7 @@ export default function BlogPostPage() {
                 className="mb-8"
             />
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">AI for Local SEO: How AI Transforms Google Business Profile Management</h1>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">AI Local SEO Optimization for Google Business Profile</h1>
             <p className="lead mt-4 text-xl text-muted-foreground">Artificial Intelligence is no longer a buzzword—it's a practical tool that is fundamentally changing how small businesses approach marketing. Here’s how AI is becoming the ultimate assistant for local SEO and Google Business Profile management.</p>
           </div>
         </div>

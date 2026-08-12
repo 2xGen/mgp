@@ -22,6 +22,8 @@ export interface ManagedLocation {
   locationName: string;
   dateAdded: any; // Can be Timestamp from Firestore or ISO string
   emoji?: string | null;
+  accountId?: string | null;
+  title?: string | null;
 }
 
 interface ApiLocation {
@@ -41,7 +43,8 @@ const PLAN_LIMITS = {
     enterprise: { locations: 10, teamMembers: 5 },
 };
 
-const COOLDOWN_DAYS = 30;
+const COOLDOWN_DAYS_PAID = 30;
+const COOLDOWN_DAYS_TRIAL = 7;
 const EMOJIS = ['⭐', '❤️', '🚀', '✅', '📍', '🏢', '🏠', '🏭', '🌍', '📌', '💼', '💡'];
 
 export default function SelectLocationsPage() {
@@ -60,6 +63,12 @@ export default function SelectLocationsPage() {
     return PLAN_LIMITS[subscription.planId]?.locations || 0;
   }, [subscription]);
 
+  const cooldownDays = useMemo(() => {
+    // Softer lock during trial so new users can correct mistakes quickly.
+    if (subscription?.status === "trialing") return COOLDOWN_DAYS_TRIAL;
+    return COOLDOWN_DAYS_PAID;
+  }, [subscription?.status]);
+
   const hasReachedLimit = useMemo(() => {
     return locationLimit > 0 && managedLocations.size >= locationLimit;
   }, [managedLocations, locationLimit]);
@@ -72,7 +81,7 @@ export default function SelectLocationsPage() {
     try {
       const [accountsResult, managedResult] = await Promise.all([
         fetchAccounts(),
-        getManagedLocations(user.uid)
+        getManagedLocations(user.id)
       ]);
 
       if (accountsResult.error) throw new Error(accountsResult.error);
@@ -118,8 +127,8 @@ export default function SelectLocationsPage() {
     if (!managedLoc?.dateAdded) return false;
 
     const daysSinceAdded = differenceInDays(new Date(), new Date(managedLoc.dateAdded));
-    return daysSinceAdded < COOLDOWN_DAYS;
-  }, [managedLocations]);
+    return daysSinceAdded < cooldownDays;
+  }, [managedLocations, cooldownDays]);
 
   const getLockTooltipContent = useCallback((locationName: string) => {
     const managedLoc = managedLocations.get(locationName);
@@ -127,21 +136,31 @@ export default function SelectLocationsPage() {
     
     const dateAdded = new Date(managedLoc.dateAdded);
     const unlockDate = new Date(dateAdded);
-    unlockDate.setDate(dateAdded.getDate() + COOLDOWN_DAYS);
+    unlockDate.setDate(dateAdded.getDate() + cooldownDays);
     
     const distance = formatDistanceToNowStrict(unlockDate, { addSuffix: true });
     return `This location is locked. You can change it ${distance}.`;
-  }, [managedLocations]);
+  }, [managedLocations, cooldownDays]);
 
 
-  const handleSelectLocation = (locationName: string, isSelected: boolean) => {
+  const handleSelectLocation = (
+    locationName: string,
+    accountId: string,
+    title: string,
+    isSelected: boolean
+  ) => {
     if (isLocationLocked(locationName)) return;
 
     setManagedLocations(prev => {
       const newMap = new Map(prev);
       if (isSelected) {
          if (newMap.size < locationLimit) {
-            newMap.set(locationName, { locationName: locationName, dateAdded: null });
+            newMap.set(locationName, {
+              locationName,
+              dateAdded: null,
+              accountId,
+              title,
+            });
          } else {
              toast({
                 title: "Location Limit Reached",
@@ -172,7 +191,7 @@ export default function SelectLocationsPage() {
     setIsSaving(true);
     try {
       const selectedForSave = Array.from(managedLocations.values());
-      const result = await saveSelectedLocations(user.uid, selectedForSave);
+      const result = await saveSelectedLocations(user.id, selectedForSave);
       
       if (result.error) {
         throw new Error(result.error);
@@ -253,7 +272,14 @@ export default function SelectLocationsPage() {
                       <Checkbox
                         id={location.name}
                         checked={isSelected}
-                        onCheckedChange={(checked) => handleSelectLocation(location.name, !!checked)}
+                        onCheckedChange={(checked) =>
+                          handleSelectLocation(
+                            location.name,
+                            account.name,
+                            location.title,
+                            !!checked
+                          )
+                        }
                         disabled={isLocked || isDisabled}
                       />
                       <Label htmlFor={location.name} className={`font-normal flex-grow cursor-pointer ${isLocked || isDisabled ? 'cursor-not-allowed text-muted-foreground' : ''}`}>
@@ -312,7 +338,9 @@ export default function SelectLocationsPage() {
               <Info className="h-4 w-4" />
               <AlertTitle>Location Locking</AlertTitle>
               <AlertDescription>
-                Newly added locations are locked for {COOLDOWN_DAYS} days to keep your dashboard stable and your AI suggestions accurate. Want to add more locations right away? Simply upgrade your plan to unlock even more flexibility.
+                Newly added locations are locked for {cooldownDays} days
+                {subscription?.status === "trialing" ? " during your trial" : ""} to keep your dashboard stable.
+                Need more flexibility? Upgrade your plan.
               </AlertDescription>
             </Alert>
         </div>
@@ -326,7 +354,7 @@ export default function SelectLocationsPage() {
         <CardHeader>
           <CardTitle>Manage Your Locations</CardTitle>
           <CardDescription>
-            You have selected {managedLocations.size} of {locationLimit} available locations. Selections are locked for {COOLDOWN_DAYS} days after saving.
+            You have selected {managedLocations.size} of {locationLimit} available locations. Selections are locked for {cooldownDays} days after saving.
           </CardDescription>
         </CardHeader>
         <CardContent>

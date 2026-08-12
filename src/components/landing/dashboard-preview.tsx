@@ -4,7 +4,6 @@
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
@@ -21,7 +20,6 @@ import {
   TooltipContent,
 } from '@/components/ui/tooltip';
 import { FileSearch, MessageSquare, Star, Phone, MapPin, Eye } from 'lucide-react';
-import { cn } from '@/lib/utils';
 import { Button } from '../ui/button';
 import { useState, useEffect } from 'react';
 
@@ -173,218 +171,168 @@ export default function DashboardPreview() {
 
   if (!isClient) {
     return (
-       <div className="relative scale-90 md:scale-100">
-         <Card className="mx-auto max-w-2xl shadow-2xl animate-pulse">
-            <CardHeader><CardTitle>Loading Preview...</CardTitle></CardHeader>
-            <CardContent><div className="h-96"></div></CardContent>
-        </Card>
-       </div>
+      <Card className="w-full animate-pulse border-0 bg-background/80 shadow-none">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">Loading preview…</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="h-72 rounded-lg bg-muted" />
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="relative scale-90 md:scale-100">
-      <Card className="mx-auto max-w-2xl shadow-2xl">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="font-headline">Your Dashboard</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                     <CardDescription>{statConfig[activeStat].title}</CardDescription>
-                     <ActiveIcon className="h-4 w-4 text-muted-foreground" />
-                </div>
-                <CardTitle className="text-3xl md:text-4xl text-brand-blue">
-                  {currentStatData.value.toLocaleString()}
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-xs text-brand-green">
-                  {currentStatData.change} from last month
-                </div>
-                 <TooltipProvider>
-                    <div className="mt-4 flex gap-1">
-                        {(Object.keys(statConfig) as StatKey[]).map(key => {
-                            const Icon = statConfig[key].icon;
-                            return (
-                                <Tooltip key={key}>
-                                    <TooltipTrigger asChild>
-                                        <Button
-                                            size="icon"
-                                            variant={activeStat === key ? "secondary" : "ghost"}
-                                            className="h-8 w-8"
-                                            onClick={() => setActiveStat(key)}
-                                        >
-                                            <Icon className="h-4 w-4" />
-                                        </Button>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                        <p>{statConfig[key].title}</p>
-                                    </TooltipContent>
-                                </Tooltip>
-                            )
-                        })}
-                    </div>
-                 </TooltipProvider>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardDescription>Reviews</CardDescription>
-                <CardTitle className="flex items-baseline gap-2 text-3xl md:text-4xl text-brand-blue">
-                  {statsData.reviews.rating} <Star className="h-5 w-5 md:h-6 md:w-6 text-brand-yellow" />
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-xs text-muted-foreground">
-                  {statsData.reviews.change}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-4">
-                <div className="flex-1">
-                  <CardTitle>Traffic Overview</CardTitle>
-                  <CardDescription>
-                    How customers are finding you on Google.
-                  </CardDescription>
-                </div>
-                <div className="flex items-center gap-2">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="sm" variant="outline">
-                        {selectedRange}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent>
-                      {Object.keys(getMockDataSets()).map((range) => (
-                        <DropdownMenuItem key={range} onClick={() => handleRangeChange(range)}>
-                          {range}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="relative h-40 rounded-lg bg-muted p-4">
-                <svg
-                  className="h-full w-full overflow-visible"
-                  viewBox="0 0 100 40"
-                  preserveAspectRatio="none"
-                  onMouseMove={handleMouseMove}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <defs>
-                    <linearGradient
-                      id="chart-gradient"
-                      x1="0"
-                      y1="0"
-                      x2="0"
-                      y2="1"
-                    >
-                      <stop
-                        offset="5%"
-                        stopColor="hsl(var(--primary))"
-                        stopOpacity={0.3}
-                      />
-                      <stop
-                        offset="95%"
-                        stopColor="hsl(var(--primary))"
-                        stopOpacity={0}
-                      />
-                    </linearGradient>
-                  </defs>
-                  <path
-                    d={chartPath}
-                    fill="none"
-                    stroke="hsl(var(--primary))"
-                    strokeWidth="1"
-                  />
-                  <path
-                    d={areaPath}
-                    fill="url(#chart-gradient)"
-                  />
-                  {hoveredData && (
-                    <g className="pointer-events-none">
-                      <line
-                        x1={position.x}
-                        y1="0"
-                        x2={position.x}
-                        y2="40"
-                        stroke="hsl(var(--primary))"
-                        strokeWidth="0.5"
-                        strokeDasharray="3 3"
-                      />
-                      <circle
-                        cx={position.x}
-                        cy={position.y}
-                        r="2"
-                        fill="hsl(var(--primary))"
-                        stroke="hsl(var(--background))"
-                        strokeWidth="0.5"
-                      />
-                    </g>
-                  )}
-                </svg>
-                {hoveredData && (
-                  <div
-                    className="pointer-events-none absolute rounded-md border bg-popover px-2 py-1 text-xs shadow-lg transition-transform"
-                    style={{
-                      left: `${position.x}%`,
-                      top: `${position.y}%`,
-                      transform: `translate(-50%, -120%)`,
-                    }}
-                  >
-                    <div className="font-semibold">{hoveredData.label}</div>
-                    <div className="text-popover-foreground">
-                      {hoveredData.value.toLocaleString()} Views
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          <div>
-            <h3 className="mb-2 text-sm font-semibold text-muted-foreground">
-              Recent Activity
-            </h3>
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
-                <MessageSquare className="h-5 w-5 text-brand-blue" />
-                <p className="text-sm">
-                  <span className="font-semibold">New review received</span> from
-                  Jane D.
-                </p>
-                <time className="ml-auto text-xs text-muted-foreground">
-                  2m ago
-                </time>
-              </div>
-              <div className="flex items-center gap-3 rounded-lg border bg-card p-3">
-                <FileSearch className="h-5 w-5 text-brand-green" />
-                <p className="text-sm">
-                  <span className="font-semibold">Profile optimized:</span> Added
-                  3 new photos.
-                </p>
-                <time className="ml-auto text-xs text-muted-foreground">
-                  1h ago
-                </time>
-              </div>
+    <Card className="w-full overflow-hidden border-0 bg-background/90 shadow-none">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="font-headline text-lg">Your Dashboard</CardTitle>
+          <span className="text-xs text-muted-foreground">Interactive demo</span>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-xl border bg-card p-3">
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">{statConfig[activeStat].title}</p>
+              <ActiveIcon className="h-3.5 w-3.5 text-muted-foreground" />
             </div>
+            <p className="mt-1 text-2xl font-bold tabular-nums text-brand-blue md:text-3xl">
+              {currentStatData.value.toLocaleString()}
+            </p>
+            <p className="mt-1 text-xs font-medium text-brand-green">
+              {currentStatData.change} from last month
+            </p>
+            <TooltipProvider>
+              <div className="mt-3 flex gap-1">
+                {(Object.keys(statConfig) as StatKey[]).map((key) => {
+                  const Icon = statConfig[key].icon;
+                  return (
+                    <Tooltip key={key}>
+                      <TooltipTrigger asChild>
+                        <Button
+                          size="icon"
+                          variant={activeStat === key ? 'secondary' : 'ghost'}
+                          className="h-7 w-7"
+                          onClick={() => setActiveStat(key)}
+                        >
+                          <Icon className="h-3.5 w-3.5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{statConfig[key].title}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                })}
+              </div>
+            </TooltipProvider>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+          <div className="rounded-xl border bg-card p-3">
+            <p className="text-xs text-muted-foreground">Reviews</p>
+            <p className="mt-1 flex items-baseline gap-1.5 text-2xl font-bold tabular-nums text-brand-blue md:text-3xl">
+              {statsData.reviews.rating}
+              <Star className="h-4 w-4 fill-brand-yellow text-brand-yellow md:h-5 md:w-5" />
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">{statsData.reviews.change}</p>
+          </div>
+        </div>
+
+        <div className="rounded-xl border bg-card p-3">
+          <div className="mb-3 flex flex-wrap items-start justify-between gap-2">
+            <div>
+              <p className="text-sm font-semibold">Traffic Overview</p>
+              <p className="text-xs text-muted-foreground">How customers find you on Google</p>
+            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" variant="outline" className="h-8 text-xs">
+                  {selectedRange}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                {Object.keys(getMockDataSets()).map((range) => (
+                  <DropdownMenuItem key={range} onClick={() => handleRangeChange(range)}>
+                    {range}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <div className="relative h-28 rounded-lg bg-muted/70 p-3 sm:h-32">
+            <svg
+              className="h-full w-full overflow-visible"
+              viewBox="0 0 100 40"
+              preserveAspectRatio="none"
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            >
+              <defs>
+                <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <path d={chartPath} fill="none" stroke="hsl(var(--primary))" strokeWidth="1.2" />
+              <path d={areaPath} fill="url(#chart-gradient)" />
+              {hoveredData && (
+                <g className="pointer-events-none">
+                  <line
+                    x1={position.x}
+                    y1="0"
+                    x2={position.x}
+                    y2="40"
+                    stroke="hsl(var(--primary))"
+                    strokeWidth="0.5"
+                    strokeDasharray="3 3"
+                  />
+                  <circle
+                    cx={position.x}
+                    cy={position.y}
+                    r="2"
+                    fill="hsl(var(--primary))"
+                    stroke="hsl(var(--background))"
+                    strokeWidth="0.5"
+                  />
+                </g>
+              )}
+            </svg>
+            {hoveredData && (
+              <div
+                className="pointer-events-none absolute rounded-md border bg-popover px-2 py-1 text-xs shadow-lg"
+                style={{
+                  left: `${position.x}%`,
+                  top: `${position.y}%`,
+                  transform: 'translate(-50%, -120%)',
+                }}
+              >
+                <div className="font-semibold">{hoveredData.label}</div>
+                <div>{hoveredData.value.toLocaleString()} Views</div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            Recent Activity
+          </p>
+          <div className="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5">
+            <MessageSquare className="h-4 w-4 shrink-0 text-brand-blue" />
+            <p className="min-w-0 flex-1 truncate text-sm">
+              <span className="font-semibold">New review</span> from Jane D.
+            </p>
+            <time className="shrink-0 text-xs text-muted-foreground">2m ago</time>
+          </div>
+          <div className="flex items-center gap-3 rounded-lg border bg-card px-3 py-2.5">
+            <FileSearch className="h-4 w-4 shrink-0 text-brand-green" />
+            <p className="min-w-0 flex-1 truncate text-sm">
+              <span className="font-semibold">Profile optimized:</span> Added 3 photos
+            </p>
+            <time className="shrink-0 text-xs text-muted-foreground">1h ago</time>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
-
-    

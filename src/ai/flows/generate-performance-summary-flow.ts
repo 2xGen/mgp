@@ -8,8 +8,8 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { PerformanceSummaryOutputSchema } from '@/lib/performance-summary';
 
-// Simplified review type for the prompt
 const ReviewSchema = z.object({
   starRating: z.string(),
   comment: z.string().optional(),
@@ -22,12 +22,14 @@ const GeneratePerformanceSummaryInputSchema = z.object({
   previousMetrics: z.any(),
   recentReviews: z.array(ReviewSchema),
 });
-export type GeneratePerformanceSummaryInput = z.infer<typeof GeneratePerformanceSummaryInputSchema>;
+export type GeneratePerformanceSummaryInput = z.infer<
+  typeof GeneratePerformanceSummaryInputSchema
+>;
 
 const summaryPrompt = ai.definePrompt({
   name: 'performanceSummaryPrompt',
   input: { schema: GeneratePerformanceSummaryInputSchema },
-  output: { format: 'text' },
+  output: { schema: PerformanceSummaryOutputSchema },
   prompt: `
     You are a business marketing expert analyzing a Google Business Profile.
 
@@ -36,18 +38,14 @@ const summaryPrompt = ai.definePrompt({
     Current 30-Day Metrics: {{{json currentMetrics}}}
     Previous 30-Day Metrics: {{{json previousMetrics}}}
     Recent Reviews: {{{json recentReviews}}}
-    
-    What you must output
-    Write a short summary (max 3 paragraphs) that includes:
 
-    Performance insights (trends compared to the previous 30 days).
-
-    Review sentiment analysis (overall tone and common themes).
-
-    Three clear, actionable recommendations for improving performance.
+    Produce a structured analysis with:
+    - performanceInsights: trends compared to the previous 30 days
+    - reviewSentiment: overall tone and common themes from reviews
+    - recommendations: exactly 3 clear, actionable next steps
 
     Tone: professional, helpful, and clear. No technical jargon.
-    Format: plain text with simple section headers.
+    Important: Do not use markdown, headings, bullets, or numbered lists inside the strings.
   `,
 });
 
@@ -58,11 +56,17 @@ const generatePerformanceSummaryFlow = ai.defineFlow(
     outputSchema: z.string(),
   },
   async (input) => {
-    const { text } = await summaryPrompt(input);
-    return text;
+    const { output } = await summaryPrompt(input);
+    if (!output) {
+      throw new Error('The AI model did not produce an output.');
+    }
+    // Persist as JSON so the UI can render structured sections.
+    return JSON.stringify(output);
   }
 );
 
-export async function generatePerformanceSummary(input: GeneratePerformanceSummaryInput): Promise<string> {
+export async function generatePerformanceSummary(
+  input: GeneratePerformanceSummaryInput
+): Promise<string> {
   return generatePerformanceSummaryFlow(input);
 }

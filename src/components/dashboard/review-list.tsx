@@ -1,10 +1,10 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { deleteReviewReply } from "@/app/actions";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Terminal, MessageSquare, Star, User, Edit, Trash2 } from "lucide-react";
+import { Loader2, Terminal, MessageSquare, Star, User, Edit, Trash2, ExternalLink, AlertTriangle, Clock } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
@@ -43,6 +43,28 @@ export interface ReviewReply {
     updateTime: string;
 }
 
+/** Google Reviews API moderation / policy fields (2026). */
+export type ReviewReplyState =
+  | 'REVIEW_REPLY_STATE_UNSPECIFIED'
+  | 'PENDING'
+  | 'APPROVED'
+  | 'REJECTED'
+  | string;
+
+export interface PolicyViolation {
+  category?: string;
+  description?: string;
+  /** Some API shapes nest details differently — keep flexible. */
+  [key: string]: unknown;
+}
+
+export interface ReviewMediaItem {
+  mediaFormat?: "PHOTO" | "VIDEO" | string;
+  googleUrl?: string;
+  thumbnailUrl?: string;
+  sourceUrl?: string;
+}
+
 export interface Review {
   name: string;
   reviewId: string;
@@ -52,9 +74,15 @@ export interface Review {
   createTime: string;
   updateTime: string;
   reviewReply?: ReviewReply;
+  reviewReplyState?: ReviewReplyState;
+  policyViolation?: PolicyViolation | PolicyViolation[];
+  reviewReplyUrl?: string;
+  reviewMediaItems?: ReviewMediaItem[];
+  /** Some API responses use camelCase reviewMediaItem singular array alias */
+  reviewMediaItem?: ReviewMediaItem[];
 }
 
-const StarRatingDisplay: React.FC<{ rating: Review['starRating'] }> = ({ rating }) => {
+const StarRatingDisplay = ({ rating }: { rating: Review['starRating'] }) => {
     const ratingMap = {
         'FIVE': 5,
         'FOUR': 4,
@@ -75,6 +103,134 @@ const StarRatingDisplay: React.FC<{ rating: Review['starRating'] }> = ({ rating 
         </div>
     );
 };
+
+function ReplyStatusBadges({ review }: { review: Review }) {
+  const state = (review.reviewReplyState || "").toUpperCase();
+  const violations = Array.isArray(review.policyViolation)
+    ? review.policyViolation
+    : review.policyViolation
+      ? [review.policyViolation]
+      : [];
+
+  if (!review.reviewReply && !state && violations.length === 0) {
+    return (
+      <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+        Needs response
+      </Badge>
+    );
+  }
+
+  let stateBadge: ReactNode = null;
+  if (state.includes("PENDING")) {
+    stateBadge = (
+      <Badge variant="secondary" className="gap-1 bg-amber-100 text-amber-900 border-amber-200">
+        <Clock className="h-3 w-3" />
+        Reply pending review
+      </Badge>
+    );
+  } else if (state.includes("REJECTED")) {
+    stateBadge = (
+      <Badge variant="destructive" className="gap-1">
+        <AlertTriangle className="h-3 w-3" />
+        Reply rejected
+      </Badge>
+    );
+  } else if (review.reviewReply || state.includes("APPROVED")) {
+    stateBadge = (
+      <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
+        Responded
+      </Badge>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap items-center justify-end gap-2">
+      {stateBadge}
+      {violations.length > 0 && (
+        <Badge variant="outline" className="gap-1 border-destructive/40 text-destructive">
+          <AlertTriangle className="h-3 w-3" />
+          Policy issue
+        </Badge>
+      )}
+    </div>
+  );
+}
+
+function ReviewMediaGallery({ review }: { review: Review }) {
+  const media = review.reviewMediaItems || review.reviewMediaItem || [];
+  if (!media.length) return null;
+
+  return (
+    <div className="mb-4 flex flex-wrap gap-2">
+      {media.slice(0, 6).map((item, idx) => {
+        const src = item.thumbnailUrl || item.googleUrl || item.sourceUrl;
+        if (!src) return null;
+        const isVideo = (item.mediaFormat || "").toUpperCase().includes("VIDEO");
+        return (
+          <a
+            key={idx}
+            href={item.googleUrl || item.sourceUrl || src}
+            target="_blank"
+            rel="noreferrer"
+            className="relative h-20 w-20 overflow-hidden rounded-lg border bg-muted"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={src} alt="" className="h-full w-full object-cover" />
+            {isVideo && (
+              <span className="absolute bottom-1 right-1 rounded bg-black/70 px-1 text-[10px] text-white">
+                Video
+              </span>
+            )}
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
+function PolicyViolationNotice({ review }: { review: Review }) {
+  const violations = Array.isArray(review.policyViolation)
+    ? review.policyViolation
+    : review.policyViolation
+      ? [review.policyViolation]
+      : [];
+
+  if (violations.length === 0) return null;
+
+  return (
+    <Alert variant="destructive" className="mt-3">
+      <AlertTriangle className="h-4 w-4" />
+      <AlertTitle>Google policy violation</AlertTitle>
+      <AlertDescription className="space-y-1">
+        {violations.map((v, i) => {
+          const category = typeof v.category === "string" ? v.category : null;
+          const description =
+            typeof v.description === "string"
+              ? v.description
+              : typeof (v as { reason?: string }).reason === "string"
+                ? (v as { reason: string }).reason
+                : "This reply was flagged by Google. Edit and resubmit.";
+          return (
+            <p key={i} className="text-sm">
+              {category ? <span className="font-medium">{category}: </span> : null}
+              {description}
+            </p>
+          );
+        })}
+        {review.reviewReplyUrl && (
+          <a
+            href={review.reviewReplyUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 text-sm font-medium underline"
+          >
+            View on Google <ExternalLink className="h-3 w-3" />
+          </a>
+        )}
+      </AlertDescription>
+    </Alert>
+  );
+}
 
 
 export default function ReviewList({ allReviews, isLoading, error }: ReviewListProps) {
@@ -171,18 +327,15 @@ export default function ReviewList({ allReviews, isLoading, error }: ReviewListP
                                     <p className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(review.createTime), { addSuffix: true })}</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-2">
-                               {review.reviewReply ? (
-                                    <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">Responded</Badge>
-                                ) : (
-                                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-200">Needs Response</Badge>
-                                )}
+                            <div className="flex flex-col items-end gap-2">
+                               <ReplyStatusBadges review={review} />
                                 <StarRatingDisplay rating={review.starRating} />
                             </div>
                         </div>
                     </CardHeader>
                     <CardContent>
                         {review.comment && <p className="text-sm text-foreground/80 mb-4">{review.comment}</p>}
+                        <ReviewMediaGallery review={review} />
                         
                         {editingReviewName === review.name ? (
                              <ReplyForm 
@@ -198,6 +351,16 @@ export default function ReviewList({ allReviews, isLoading, error }: ReviewListP
                                         <p className="font-semibold text-sm mb-2">Your reply</p>
                                         <p className="text-sm text-muted-foreground whitespace-pre-wrap">{review.reviewReply.comment}</p>
                                         <p className="text-xs text-muted-foreground/80 mt-2">Updated {formatDistanceToNow(new Date(review.reviewReply.updateTime), { addSuffix: true })}</p>
+                                        {review.reviewReplyUrl && (
+                                          <a
+                                            href={review.reviewReplyUrl}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                                          >
+                                            Open on Google <ExternalLink className="h-3 w-3" />
+                                          </a>
+                                        )}
                                     </div>
                                     <div className="flex gap-1">
                                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditingReviewName(review.name)}>
@@ -224,6 +387,7 @@ export default function ReviewList({ allReviews, isLoading, error }: ReviewListP
                                         </AlertDialog>
                                     </div>
                                 </div>
+                                <PolicyViolationNotice review={review} />
                             </div>
                         ) : (
                             <ReplyForm 

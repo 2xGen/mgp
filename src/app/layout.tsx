@@ -7,6 +7,7 @@ import { Inter, Lexend } from "next/font/google";
 import { CookieConsentProvider } from "@/components/cookie-consent-provider";
 import CookieBanner from "@/components/cookie-banner";
 import TrackingScripts from "@/components/tracking-scripts";
+import ConsentAwareAnalytics from "@/components/consent-aware-analytics";
 import { Suspense } from "react";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -17,8 +18,8 @@ const faviconUrl =
   "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/public/MGP/MGP%20logo%20fav.png";
 const ogImageUrl = "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/public/MGP/opengraph.jpg";
 
-const title = "GBP Management – Fix Poor Google Business Profile with AI";
-const description = "Poor GBP management costs you customers. Fix it with AI-powered Google Business Profile management: AI-powered review replies, one dashboard, more local traffic.";
+const title = "MyGoProfile – Google Business Profile intelligence & management";
+const description = "Get more from your Google Business Profile. Performance data, reviews, and optimization tools in one dashboard — so you know what's working and what to do next.";
 
 
 export const metadata: Metadata = {
@@ -43,7 +44,7 @@ export const metadata: Metadata = {
         url: ogImageUrl,
         width: 1200,
         height: 630,
-        alt: 'GBP Management – Fix poor Google Business Profile with AI',
+        alt: 'MyGoProfile – Google Business Profile intelligence and management',
       },
     ],
   },
@@ -71,6 +72,7 @@ export default function RootLayout({
             {children}
             <Toaster />
             <CookieBanner />
+            <ConsentAwareAnalytics />
             <Suspense fallback={null}>
               <TrackingScripts />
             </Suspense>

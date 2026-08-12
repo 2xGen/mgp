@@ -29,7 +29,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Loader2, Terminal, UploadCloud } from "lucide-react";
-import { startMediaUpload, createMediaItem } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
 
 interface UploadPhotoFormProps {
@@ -40,6 +39,7 @@ interface UploadPhotoFormProps {
 const formSchema = z.object({
   photo: z.any()
     .refine(files => files?.length === 1, "Photo is required.")
+    .refine(files => files?.[0]?.size >= 10 * 1024, "Photo must be at least 10KB.")
     .refine(files => files?.[0]?.size <= 5 * 1024 * 1024, `Max file size is 5MB.`)
     .refine(
       files => ["image/jpeg", "image/png"].includes(files?.[0]?.type),
@@ -77,43 +77,53 @@ export default function UploadPhotoForm({ locationName, onPhotoUploaded }: Uploa
   const onSubmit = async (values: PhotoFormValues) => {
     setIsSubmitting(true);
     setError(null);
-    
-    if (!preview) {
-        setError("File preview is not available.");
-        setIsSubmitting(false);
-        return;
+
+    const file = values.photo?.[0] as File | undefined;
+    if (!file) {
+      setError("Photo is required.");
+      setIsSubmitting(false);
+      return;
     }
 
     try {
-      // 1. Start the upload process to get an upload URL
-      const startResult = await startMediaUpload(locationName);
-      if (startResult.error || !startResult.uploadUrl) {
-        throw new Error(startResult.error || "Failed to start upload process.");
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("locationName", locationName);
+      formData.append("description", values.description || "");
+
+      const res = await fetch("/api/google/media/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      let payload: { error?: string; data?: unknown } = {};
+      try {
+        payload = await res.json();
+      } catch {
+        throw new Error(
+          res.ok
+            ? "Upload failed (invalid server response)."
+            : `Upload failed (HTTP ${res.status}). Refresh the page and try again.`
+        );
       }
 
-      // 2. Create the media item using the upload URL and file data
-      const createResult = await createMediaItem(
-        locationName,
-        preview,
-        startResult.uploadUrl,
-        values.description || ''
-      );
-
-      if (createResult.error) {
-        throw new Error(createResult.error);
+      if (!res.ok || payload.error) {
+        throw new Error(payload.error || `Upload failed (HTTP ${res.status}).`);
+      }
+      if (!payload.data) {
+        throw new Error("Upload succeeded but Google returned no media item. Refresh and try again.");
       }
 
-      onPhotoUploaded(createResult.data);
+      onPhotoUploaded(payload.data);
       toast({
         title: "Success",
         description: "Your photo has been uploaded.",
       });
       setIsDialogOpen(false);
-      
-    } catch (e: any) {
-        setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Upload failed.");
     } finally {
-        setIsSubmitting(false);
+      setIsSubmitting(false);
     }
   };
 

@@ -13,12 +13,12 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 const imageUrl = "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/google%20business%20categories.png";
 
 export const metadata: Metadata = {
-  title: 'Google Business Categories: How to Pick the Right One (and Why It Matters)',
-  description: 'How to pick Google Business categories: choose one specific primary category and up to nine secondary. Why it matters for local SEO and "near me" rankings.',
-  keywords: ['how to pick google business categories', 'google business profile categories', 'gbp categories', 'primary category gbp', 'secondary categories google business', 'google business category selection'],
+  title: 'Google Business Profile Categories List: How to Choose the Right One',
+  description: 'How to choose Google Business Profile categories: one specific primary + up to 9 secondary. Includes tips for Google My Business categories and why your category list matters for local SEO.',
+  keywords: ['google business categories list', 'google my business categories', 'google business categories', 'google my business category', 'choose category', 'how to pick google business categories', 'google business profile categories', 'gbp categories', 'primary category gbp', 'secondary categories google business'],
   openGraph: {
-    title: 'Google Business Categories: How to Pick the Right One (and Why It Matters)',
-    description: 'Pick the right primary and secondary Google Business Profile categories. One primary, up to nine secondary—why it matters for local SEO.',
+    title: 'Google Business Profile Categories List: How to Choose the Right One',
+    description: 'How to choose Google Business Profile categories: one specific primary + up to 9 secondary. Includes tips for Google My Business categories and why your category list matters for local SEO.',
     url: '/resources/how-to-pick-google-business-categories',
     siteName: 'MyGoProfile',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Google Business Categories: How to Pick the Right One (and Why It Matters)',
-    description: 'One primary category, up to nine secondary. How to choose and why it matters for local SEO.',
+    title: 'Google Business Profile Categories List: How to Choose the Right One',
+    description: 'How to choose Google Business Profile categories: one specific primary + up to 9 secondary. Includes tips for Google My Business categories and why your category list matters for local SEO.',
     images: [imageUrl],
   },
 }
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: 'Google Business Categories: How to Pick the Right One (and Why It Matters)',
-  description: 'How to pick Google Business categories: one primary, up to nine secondary. Why category choice matters for local SEO and "near me" rankings.',
+  headline: 'Google Business Profile Categories: How to Choose the Right One',
+  description: 'How to choose Google Business Profile categories: one specific primary + up to 9 secondary. Includes tips for Google My Business categories and why your category list matters for local SEO.',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -208,7 +208,7 @@ export default function BlogPost() {
                 className="mb-8"
             />
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">Google Business Categories: How to Pick the Right One (and Why It Matters)</h1>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">Google Business Profile Categories: How to Choose the Right One</h1>
             <p className="lead mt-4 text-xl text-muted-foreground">Choosing your GBP categories seems simple, but it's one of the most critical local SEO decisions you'll make. This guide shows you how to do it right.</p>
           </div>
         </div>

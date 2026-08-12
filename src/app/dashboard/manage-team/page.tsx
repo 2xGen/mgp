@@ -1,29 +1,24 @@
-
-
 "use client";
 
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { Loader2, UserPlus, Trash2, Settings, Zap, Copy, ShieldCheck } from "lucide-react";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Loader2, Terminal, UserCheck, Trash2, UserPlus, Zap, Eye, Info, Settings } from "lucide-react";
-import { 
-    fetchLocations, 
-    fetchAccounts, 
-    fetchAdminsForAccount, 
-    fetchAdminsForLocation,
-    getTeamInvites,
-    getManagedLocations,
-    removeTeamInvite
+  getTeamInvites,
+  getManagedLocations,
+  removeTeamInvite,
+  fetchAccounts,
+  fetchLocations,
 } from "@/app/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useAuth } from "@/app/auth-provider";
 import InviteUserForm from "@/components/dashboard/invite-user-form";
 import { useToast } from "@/hooks/use-toast";
@@ -39,46 +34,43 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import Link from "next/link";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ScrollArea } from "@/components/ui/scroll-area";
-
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export interface TeamInvite {
-    id: string;
-    name: string;
-    inviteCode: string;
-    locations: string[];
-    status: 'pending' | 'claimed';
-    claimedBy: string | null;
-    createdAt: string;
+  id: string;
+  name: string;
+  inviteCode: string;
+  locations: string[];
+  status: "pending" | "claimed";
+  claimedBy: string | null;
+  createdAt: string;
 }
 
 export interface Location {
-    name: string;
-    title: string;
+  name: string;
+  title: string;
 }
 
+/** @deprecated kept for older imports — team invites no longer require Google GBP users */
 export interface UserGoogleAccess {
-    email: string;
-    name: string;
-    role: string;
-    isPending: boolean;
-    accessibleLocations: Location[];
+  email: string;
+  name: string;
+  role: string;
+  isPending: boolean;
+  accessibleLocations: Location[];
 }
 
 const PLAN_LIMITS = {
-    starter: { locations: 1, teamMembers: 1 },
-    growth: { locations: 3, teamMembers: 3 },
-    enterprise: { locations: 10, teamMembers: 5 },
+  starter: { locations: 1, teamMembers: 1 },
+  growth: { locations: 3, teamMembers: 3 },
+  enterprise: { locations: 10, teamMembers: 5 },
 };
-
 
 export default function ManageTeamPage() {
   const { user, subscription } = useAuth();
   const { toast } = useToast();
   const [teamInvites, setTeamInvites] = useState<TeamInvite[]>([]);
   const [managedLocations, setManagedLocations] = useState<Location[]>([]);
-  const [allGoogleUsers, setAllGoogleUsers] = useState<UserGoogleAccess[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -87,11 +79,15 @@ export default function ManageTeamPage() {
     return PLAN_LIMITS[subscription.planId]?.teamMembers || 0;
   }, [subscription]);
 
-  const hasReachedLimit = useMemo(() => {
-    // We count pending and claimed invites against the limit.
-    const activeInvites = teamInvites.filter(inv => inv.status === 'pending' || inv.status === 'claimed').length;
-    return teamMemberLimit > 0 && activeInvites >= teamMemberLimit;
-  }, [teamInvites, teamMemberLimit]);
+  const activeInviteCount = useMemo(
+    () =>
+      teamInvites.filter((inv) => inv.status === "pending" || inv.status === "claimed")
+        .length,
+    [teamInvites]
+  );
+
+  const hasReachedLimit =
+    teamMemberLimit > 0 && activeInviteCount >= teamMemberLimit;
 
   const getInitialData = useCallback(async () => {
     if (!user) return;
@@ -99,409 +95,289 @@ export default function ManageTeamPage() {
     setError(null);
 
     try {
-        const [accountsResult, invitesResult, managedLocsResult] = await Promise.all([
-            fetchAccounts(),
-            getTeamInvites(user.uid),
-            getManagedLocations(user.uid)
-        ]);
+      const [invitesResult, managedLocsResult, accountsResult] = await Promise.all([
+        getTeamInvites(user.id),
+        getManagedLocations(user.id),
+        fetchAccounts(),
+      ]);
 
-        if (accountsResult.error) throw new Error(accountsResult.error);
-        if (invitesResult.error) throw new Error(invitesResult.error);
-        if (managedLocsResult.error) throw new Error(managedLocsResult.error);
-        
-        setTeamInvites(invitesResult.data || []);
-        
-        const fetchedAccounts = accountsResult.accounts || [];
-        if (fetchedAccounts.length === 0) {
-            setIsLoading(false);
-            return;
+      if (invitesResult.error) throw new Error(invitesResult.error);
+      if (managedLocsResult.error) throw new Error(managedLocsResult.error);
+      if (accountsResult.error) throw new Error(accountsResult.error);
+
+      setTeamInvites(invitesResult.data || []);
+
+      const titleByName = new Map<string, string>();
+      for (const account of accountsResult.accounts || []) {
+        const locs = await fetchLocations(account.name);
+        for (const loc of locs.locations || []) {
+          titleByName.set(loc.name, loc.title);
         }
+      }
 
-        // --- DATA FETCHING & PROCESSING ---
-        const usersMap = new Map<string, UserGoogleAccess>();
-        const allApiLocationsMap = new Map<string, Location>();
+      const managed = (managedLocsResult.locations || [])
+        .map((ml) => ({
+          name: ml.locationName,
+          title: titleByName.get(ml.locationName) || ml.locationName.split("/").pop() || ml.locationName,
+        }))
+        .filter((l) => l.name);
 
-        // First pass: Get all account-level admins and all locations
-        for (const account of fetchedAccounts) {
-            const [adminsRes, locationsRes] = await Promise.all([
-                fetchAdminsForAccount(account.name),
-                fetchLocations(account.name)
-            ]);
-
-            const locationsForThisAccount = locationsRes.locations || [];
-
-            locationsForThisAccount.forEach((loc: Location) => {
-                if (!allApiLocationsMap.has(loc.name)) {
-                    allApiLocationsMap.set(loc.name, { name: loc.name, title: loc.title });
-                }
-            });
-            
-            if (adminsRes.data?.admins) {
-                adminsRes.data.admins.forEach((admin: any) => {
-                    const adminIdentifier = admin.admin;
-                    let adminEmail = admin.admin;
-                    if (admin.admin.includes('/')) {
-                        adminEmail = admin.admin.split('/')[1];
-                    }
-
-                    const adminName = admin.displayName || adminEmail;
-                    
-                    if (!usersMap.has(adminIdentifier) && adminEmail !== user.email) {
-                         usersMap.set(adminIdentifier, {
-                            email: adminEmail,
-                            name: adminName,
-                            role: admin.role,
-                            isPending: admin.pendingInvitation || false,
-                            accessibleLocations: [],
-                        });
-                    }
-                     // A user can be admin of multiple accounts, update role if a higher one is found
-                    const existingUser = usersMap.get(adminIdentifier);
-                    if(existingUser && (admin.role === 'PRIMARY_OWNER' || admin.role === 'OWNER')) {
-                        existingUser.role = admin.role;
-                    }
-                });
-            }
-        }
-        
-        const allApiLocations = Array.from(allApiLocationsMap.values());
-
-        // Second pass: Get location-level admins and correctly associate all locations
-        for(const location of allApiLocations) {
-            const locationAdminsRes = await fetchAdminsForLocation(location.name);
-            if (locationAdminsRes.data?.admins) {
-                 locationAdminsRes.data.admins.forEach((admin: any) => {
-                    const adminIdentifier = admin.admin;
-                    const userToUpdate = usersMap.get(adminIdentifier);
-                    if (userToUpdate) {
-                         if (!userToUpdate.accessibleLocations.some(l => l.name === location.name)) {
-                            userToUpdate.accessibleLocations.push(location);
-                        }
-                    }
-                });
-            }
-        }
-        
-        // Third pass: Assign account-wide locations to owners/managers
-         for (const account of fetchedAccounts) {
-            const locationsForThisAccount = await fetchLocations(account.name).then(res => res.locations || []);
-            const accountAdminsRes = await fetchAdminsForAccount(account.name);
-            if(accountAdminsRes.data?.admins) {
-                accountAdminsRes.data.admins.forEach((admin: any) => {
-                    const adminIdentifier = admin.admin;
-                    const userToUpdate = usersMap.get(adminIdentifier);
-                    if(userToUpdate && (userToUpdate.role.includes('OWNER') || userToUpdate.role.includes('MANAGER'))) {
-                         locationsForThisAccount.forEach((loc: Location) => {
-                            if (!userToUpdate.accessibleLocations.some(l => l.name === loc.name)) {
-                                userToUpdate.accessibleLocations.push(loc);
-                            }
-                        })
-                    }
-                });
-            }
-        }
-        
-        setAllGoogleUsers(Array.from(usersMap.values()));
-
-        if (managedLocsResult.locations) {
-            const updatedManaged = managedLocsResult.locations
-              .map(ml => allApiLocationsMap.get(ml.locationName))
-              .filter((l): l is Location => l !== undefined);
-            setManagedLocations(updatedManaged);
-        }
-
-
-    } catch (e: any) {
-        setError(e.message || "An error occurred while fetching your data.");
-        console.error(e);
+      setManagedLocations(managed);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Could not load team data.";
+      setError(message);
+      console.error(e);
     } finally {
-        setIsLoading(false);
+      setIsLoading(false);
     }
   }, [user]);
-  
+
   useEffect(() => {
-    getInitialData();
+    void getInitialData();
   }, [getInitialData]);
 
   const handleInvitesChange = () => {
-      if(user) {
-        getTeamInvites(user.uid).then(res => {
-            if (res.data) setTeamInvites(res.data);
-        });
-      }
-  }
+    if (!user) return;
+    getTeamInvites(user.id).then((res) => {
+      if (res.data) setTeamInvites(res.data);
+    });
+  };
 
   const handleRemoveInvite = async (inviteId: string) => {
     const result = await removeTeamInvite(inviteId);
     if (result.error) {
-        toast({ title: "Error", description: result.error, variant: "destructive" });
+      toast({ title: "Could not remove invite", description: result.error, variant: "destructive" });
     } else {
-        toast({ title: "Success", description: "Team invite removed." });
-        handleInvitesChange();
+      toast({ title: "Invite removed" });
+      handleInvitesChange();
     }
-  }
-
-  const existingInvitesMap = useMemo(() => {
-    const map = new Map<string, TeamInvite>();
-    teamInvites.forEach(inv => map.set(inv.name, inv)); // Assuming name is unique
-    return map;
-  }, [teamInvites]);
-  
-  const renderMyTeamCard = () => {
-     return (
-        <Card>
-             <CardHeader>
-                <div className="flex items-center gap-2">
-                    <UserCheck className="h-6 w-6" />
-                    <CardTitle className="text-2xl">MyGoProfile Team Invites</CardTitle>
-                </div>
-                <CardDescription>
-                    Invites you have created for users. You have used {teamInvites.length} of {teamMemberLimit} available team member seats.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="space-y-4">
-                     <Alert>
-                        <Info className="h-4 w-4" />
-                        <AlertTitle>How Invites Work</AlertTitle>
-                        <AlertDescription>
-                            <ol className="list-decimal list-inside space-y-1">
-                                <li><strong>Generate Code:</strong> Create an invite for a user from the "All Google Users" list below.</li>
-                                <li><strong>Share Code:</strong> Give the one-time invite code to your team member.</li>
-                                <li><strong>Team Member Signs In:</strong> They must sign in to MyGoProfile with the same Google account and enter the code on the welcome screen to join your team.</li>
-                            </ol>
-                        </AlertDescription>
-                    </Alert>
-                    {teamInvites.length === 0 ? (
-                        <div className="px-6 pb-6">
-                            <p className="text-sm text-muted-foreground p-6 text-center border rounded-md">You haven't created any team invites yet. Create them from the "All Google Users" list below.</p>
-                        </div>
-                    ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Team/User Name</TableHead>
-                                    <TableHead>Invite Code</TableHead>
-                                    <TableHead>Assigned Locations</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Actions</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {teamInvites.map(invite => {
-                                    const gUser = allGoogleUsers.find(u => u.name === invite.name);
-                                    
-                                    return (
-                                        <TableRow key={invite.id}>
-                                            <TableCell className="font-medium">{invite.name}</TableCell>
-                                            <TableCell><Badge variant="outline">{invite.inviteCode}</Badge></TableCell>
-                                            <TableCell>
-                                                <div className="flex flex-wrap gap-1">
-                                                    {invite.locations.length > 0 ? invite.locations.map(locName => {
-                                                        const locTitle = managedLocations.find(l => l.name === locName)?.title || locName.split('/').pop();
-                                                        return <Badge key={locName} variant="secondary">{locTitle}</Badge>
-                                                    }) : <Badge variant="outline">No locations assigned</Badge>}
-                                                </div>
-                                            </TableCell>
-                                            <TableCell>
-                                                {invite.status === 'claimed' ? (
-                                                    <Badge className="bg-blue-100 text-blue-800 border-blue-200">Claimed</Badge>
-                                                ) : (
-                                                    <Badge variant="secondary">Pending</Badge>
-                                                )}
-                                            </TableCell>
-                                            <TableCell className="text-right flex items-center justify-end gap-1">
-                                                 {invite.status === 'claimed' && gUser && (
-                                                    <InviteUserForm
-                                                        mode="edit"
-                                                        existingInvite={invite}
-                                                        trigger={
-                                                            <Button variant="ghost" size="icon" className="h-8 w-8"><Settings className="h-4 w-4" /></Button>
-                                                        }
-                                                        onInviteCreated={handleInvitesChange}
-                                                        currentUserId={user?.uid || ''}
-                                                        assignableLocations={managedLocations.filter(ml => gUser.accessibleLocations.some(al => al.name === ml.name))}
-                                                        userGoogleAccess={gUser}
-                                                    />
-                                                )}
-                                                <AlertDialog>
-                                                    <AlertDialogTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive"><Trash2 className="h-4 w-4" /></Button>
-                                                    </AlertDialogTrigger>
-                                                    <AlertDialogContent>
-                                                        <AlertDialogHeader><AlertDialogTitle>Remove invite for {invite.name}?</AlertDialogTitle></AlertDialogHeader>
-                                                        <AlertDialogDescription>This will delete the invite code and it will no longer be usable. This does not affect their Google access.</AlertDialogDescription>
-                                                        <AlertDialogFooter>
-                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                            <AlertDialogAction onClick={() => handleRemoveInvite(invite.id)} className="bg-destructive hover:bg-destructive/90">Remove</AlertDialogAction>
-                                                        </AlertDialogFooter>
-                                                    </AlertDialogContent>
-                                                </AlertDialog>
-                                            </TableCell>
-                                        </TableRow>
-                                    )
-                                })}
-                            </TableBody>
-                        </Table>
-                    )}
-                </div>
-             </CardContent>
-        </Card>
-     )
-  }
-
-  const renderGoogleUsersCard = () => {
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle>All Google Business Profile Users</CardTitle>
-                <CardDescription>
-                    A list of all users who have any access to your connected Google Business accounts and locations. You can create an invite code for them from here.
-                </CardDescription>
-            </CardHeader>
-            <CardContent className="p-0">
-                {hasReachedLimit && (
-                    <div className="px-6 pb-4">
-                        <Alert>
-                            <Zap className="h-4 w-4" />
-                            <AlertTitle>You've Reached Your Team Member Limit</AlertTitle>
-                            <AlertDescription>
-                            Your current plan includes {teamMemberLimit} team member{teamMemberLimit > 1 ? 's' : ''}. To invite more, please{" "}
-                            <Link href="/dashboard/settings" className="font-semibold text-primary hover:underline">
-                                upgrade your plan
-                            </Link>.
-                            </AlertDescription>
-                        </Alert>
-                    </div>
-                )}
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>User</TableHead>
-                            <TableHead>Google Role</TableHead>
-                            <TableHead>Accessible Locations</TableHead>
-                            <TableHead>App Status</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {allGoogleUsers.length > 0 ? allGoogleUsers.map((gUser) => {
-                            const existingInvite = existingInvitesMap.get(gUser.name);
-                            
-                            let statusBadge;
-                            if (gUser.isPending) {
-                                statusBadge = <Badge variant="outline">Pending on Google</Badge>;
-                            } else if (existingInvite?.status === 'claimed') {
-                                statusBadge = <Badge className="bg-blue-100 text-blue-800 border-blue-200">Claimed</Badge>;
-                            } else if (existingInvite) {
-                                statusBadge = <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200">Invite Pending</Badge>;
-                            } else {
-                                statusBadge = <Badge variant="secondary">Google User</Badge>;
-                            }
-
-                            return (
-                                <TableRow key={gUser.name}>
-                                    <TableCell className="font-medium">{gUser.name}</TableCell>
-                                    <TableCell><Badge variant="secondary">{gUser.role}</Badge></TableCell>
-                                    <TableCell>
-                                        <Popover>
-                                            <PopoverTrigger asChild>
-                                                <Button variant="outline" size="sm" disabled={gUser.accessibleLocations.length === 0}>
-                                                    <Eye className="mr-2 h-4 w-4" />
-                                                    View ({gUser.accessibleLocations.length})
-                                                </Button>
-                                            </PopoverTrigger>
-                                            <PopoverContent className="w-80">
-                                                <div className="space-y-2">
-                                                    <h4 className="font-medium leading-none">Accessible Locations</h4>
-                                                    <p className="text-sm text-muted-foreground">This user has Google access to the following locations.</p>
-                                                </div>
-                                                <ScrollArea className="h-40 mt-4">
-                                                    <div className="space-y-1">
-                                                        {gUser.accessibleLocations.map(loc => (
-                                                            <div key={loc.name} className="text-sm p-2 rounded-md bg-muted">{loc.title}</div>
-                                                        ))}
-                                                    </div>
-                                                </ScrollArea>
-                                            </PopoverContent>
-                                        </Popover>
-                                    </TableCell>
-                                    <TableCell>
-                                        {statusBadge}
-                                    </TableCell>
-                                    <TableCell className="text-right">
-                                        {gUser.isPending ? null : existingInvite?.status === 'claimed' ? (
-                                            <InviteUserForm
-                                                mode="edit"
-                                                existingInvite={existingInvite}
-                                                trigger={
-                                                    <Button variant="outline" size="sm"><Settings className="mr-2 h-4 w-4" /> Manage</Button>
-                                                }
-                                                onInviteCreated={handleInvitesChange}
-                                                currentUserId={user?.uid || ''}
-                                                assignableLocations={managedLocations.filter(ml => gUser.accessibleLocations.some(al => al.name === ml.name))}
-                                                userGoogleAccess={gUser}
-                                            />
-                                        ) : existingInvite ? (
-                                            <span className="text-xs text-muted-foreground italic">Invite sent</span>
-                                        ) : (
-                                            <InviteUserForm 
-                                                mode="create"
-                                                trigger={
-                                                    <Button variant="outline" size="sm" disabled={hasReachedLimit}><UserPlus className="mr-2 h-4 w-4" /> Create Invite</Button>
-                                                }
-                                                onInviteCreated={handleInvitesChange}
-                                                currentUserId={user?.uid || ''}
-                                                assignableLocations={managedLocations.filter(ml => gUser.accessibleLocations.some(al => al.name === ml.name))}
-                                                userGoogleAccess={gUser}
-                                            />
-                                        )}
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        }) : (
-                            <TableRow>
-                                <TableCell colSpan={5} className="text-center text-muted-foreground p-8">
-                                    No other Google users found with access to your locations.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </CardContent>
-        </Card>
-    );
   };
-  
+
+  const copyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast({ title: "Copied", description: "Invite code copied." });
+  };
+
   if (isLoading) {
-     return (
-        <div className="py-8 max-w-5xl mx-auto px-4">
-             <div className="flex items-center gap-2 text-muted-foreground p-6">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Loading team data...</span>
-            </div>
-        </div>
-    )
+    return (
+      <div className="flex items-center justify-center gap-2 py-20 text-muted-foreground">
+        <Loader2 className="h-5 w-5 animate-spin" />
+        Loading team…
+      </div>
+    );
   }
 
   if (error) {
     return (
-        <div className="py-8 max-w-5xl mx-auto px-4">
-            <Alert variant="destructive" className="mt-4">
-                <Terminal className="h-4 w-4" />
-                <AlertTitle>API Error</AlertTitle>
-                <AlertDescription><pre className="whitespace-pre-wrap">{error}</pre></AlertDescription>
-            </Alert>
-        </div>
+      <Alert variant="destructive" className="max-w-2xl">
+        <AlertTitle>Something went wrong</AlertTitle>
+        <AlertDescription>{error}</AlertDescription>
+      </Alert>
     );
   }
 
   return (
-    <div className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        {renderMyTeamCard()}
-        {renderGoogleUsersCard()}
+    <div className="mx-auto max-w-3xl space-y-8 py-8">
+      <div>
+        <h1 className="font-headline text-3xl font-semibold tracking-tight">Team</h1>
+        <p className="mt-2 max-w-2xl text-muted-foreground">
+          Give people access to MyGoProfile without sharing your Google login. They stay
+          signed in with their own account; your connected Business Profile powers the data.
+        </p>
+      </div>
+
+      <div className="rounded-2xl border bg-primary/[0.04] px-5 py-4">
+        <div className="flex gap-3">
+          <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
+          <div className="text-sm text-muted-foreground">
+            <p className="font-medium text-foreground">How it works</p>
+            <ol className="mt-2 list-decimal space-y-1 pl-4">
+              <li>Create an invite and pick which locations they can see.</li>
+              <li>Share the one-time code.</li>
+              <li>
+                They sign in to MyGoProfile (any Google account), enter the code on welcome,
+                and start working — no Google Business admin rights needed.
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-muted-foreground">
+          Using <span className="font-semibold text-foreground">{activeInviteCount}</span> of{" "}
+          <span className="font-semibold text-foreground">{teamMemberLimit}</span> team seats
+          on your plan.
+        </p>
+
+        {hasReachedLimit ? (
+          <Button asChild variant="outline">
+            <Link href="/dashboard/settings">Upgrade for more seats</Link>
+          </Button>
+        ) : (
+          <InviteUserForm
+            mode="create"
+            currentUserId={user?.id || ""}
+            assignableLocations={managedLocations}
+            onInviteCreated={handleInvitesChange}
+            trigger={
+              <Button disabled={managedLocations.length === 0}>
+                <UserPlus className="mr-2 h-4 w-4" />
+                Invite teammate
+              </Button>
+            }
+          />
+        )}
+      </div>
+
+      {hasReachedLimit && (
+        <Alert>
+          <Zap className="h-4 w-4" />
+          <AlertTitle>Team seat limit reached</AlertTitle>
+          <AlertDescription>
+            Your plan includes {teamMemberLimit} teammate
+            {teamMemberLimit === 1 ? "" : "s"}.{" "}
+            <Link href="/dashboard/settings" className="font-semibold text-primary hover:underline">
+              Upgrade
+            </Link>{" "}
+            to invite more.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {managedLocations.length === 0 && (
+        <Alert>
+          <AlertTitle>Add a location first</AlertTitle>
+          <AlertDescription>
+            Choose which Google Business locations to manage, then invite teammates.{" "}
+            <Link
+              href="/dashboard/select-locations"
+              className="font-semibold text-primary hover:underline"
+            >
+              Manage locations
+            </Link>
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <div className="overflow-hidden rounded-2xl border">
+        {teamInvites.length === 0 ? (
+          <div className="px-6 py-12 text-center text-sm text-muted-foreground">
+            No teammates yet. Create an invite to get started.
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Code</TableHead>
+                <TableHead>Locations</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {teamInvites.map((invite) => (
+                <TableRow key={invite.id}>
+                  <TableCell className="font-medium">{invite.name}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <Badge variant="outline" className="font-mono">
+                        {invite.inviteCode}
+                      </Badge>
+                      {invite.status === "pending" && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          onClick={() => copyCode(invite.inviteCode)}
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {invite.locations.length > 0 ? (
+                        invite.locations.map((locName) => {
+                          const title =
+                            managedLocations.find((l) => l.name === locName)?.title ||
+                            locName.split("/").pop();
+                          return (
+                            <Badge key={locName} variant="secondary">
+                              {title}
+                            </Badge>
+                          );
+                        })
+                      ) : (
+                        <span className="text-sm text-muted-foreground">None</span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    {invite.status === "claimed" ? (
+                      <Badge className="bg-blue-100 text-blue-800 border-blue-200">Joined</Badge>
+                    ) : (
+                      <Badge variant="secondary">Waiting</Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      {invite.status === "claimed" && (
+                        <InviteUserForm
+                          mode="edit"
+                          existingInvite={invite}
+                          currentUserId={user?.id || ""}
+                          assignableLocations={managedLocations}
+                          onInviteCreated={handleInvitesChange}
+                          trigger={
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <Settings className="h-4 w-4" />
+                            </Button>
+                          }
+                        />
+                      )}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Remove {invite.name}?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This deletes the invite
+                              {invite.status === "claimed"
+                                ? " and removes their MyGoProfile team access"
+                                : ""}
+                              . It does not change anything in Google.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => handleRemoveInvite(invite.id)}
+                              className="bg-destructive hover:bg-destructive/90"
+                            >
+                              Remove
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </div>
     </div>
   );
 }
-
-  

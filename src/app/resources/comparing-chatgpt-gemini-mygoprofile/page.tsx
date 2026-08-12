@@ -14,12 +14,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 const imageUrl = "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/Comparing%20ChatGPT,%20Gemini,%20and%20MyGoProfile%20for%20Local%20SEO%20Tasks.png";
 
 export const metadata: Metadata = {
-  title: 'ChatGPT vs. Gemini vs. MyGoProfile for Local SEO Tasks',
-  description: 'ChatGPT and Gemini vs a specialized GBP tool: workflow, context, and when to use which for review replies and local SEO.',
-  keywords: ['ChatGPT vs MyGoProfile', 'Gemini for local SEO', 'AI tools for GBP', 'specialized vs general AI'],
+  title: 'ChatGPT vs Gemini for Local SEO (vs a GBP Tool)',
+  description: 'Local SEO for ChatGPT and Gemini vs a specialized Google Business Profile tool. Workflow comparison: copy-paste chatbots vs 1-click GBP review replies and insights.',
+  keywords: ['local seo for chatgpt and gemini', 'gemini vs chatgpt for seo', 'ChatGPT vs MyGoProfile', 'Gemini for local SEO', 'AI tools for GBP', 'specialized vs general AI'],
   openGraph: {
-    title: 'ChatGPT vs. Gemini vs. MyGoProfile for Local SEO',
-    description: 'General AI vs a tool built for GBP: workflow, context, and when each makes sense.',
+    title: 'ChatGPT vs Gemini for Local SEO (vs a GBP Tool)',
+    description: 'Local SEO for ChatGPT and Gemini vs a specialized Google Business Profile tool. Workflow comparison: copy-paste chatbots vs 1-click GBP review replies and insights.',
     url: '/resources/comparing-chatgpt-gemini-mygoprofile',
     siteName: 'MyGoProfile',
     images: [
@@ -37,8 +37,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'ChatGPT vs. Gemini vs. MyGoProfile for Local SEO',
-    description: 'General AI vs a tool built for GBP: workflow and context.',
+    title: 'ChatGPT vs Gemini for Local SEO (vs a GBP Tool)',
+    description: 'Local SEO for ChatGPT and Gemini vs a specialized Google Business Profile tool. Workflow comparison: copy-paste chatbots vs 1-click GBP review replies and insights.',
     images: [imageUrl],
   },
 }
@@ -46,8 +46,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: 'ChatGPT vs. Gemini vs. MyGoProfile for Local SEO Tasks',
-  description: 'ChatGPT and Gemini vs a specialized GBP tool: workflow, context, and when to use which for review replies and local SEO.',
+  headline: 'ChatGPT vs Gemini for Local SEO — and When You Need MyGoProfile',
+  description: 'Local SEO for ChatGPT and Gemini vs a specialized Google Business Profile tool. Workflow comparison: copy-paste chatbots vs 1-click GBP review replies and insights.',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -202,7 +202,7 @@ export default function BlogPost() {
                 className="mb-8"
             />
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">ChatGPT vs. Gemini vs. MyGoProfile for Local SEO</h1>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">ChatGPT vs Gemini for Local SEO — and When You Need MyGoProfile</h1>
             <p className="lead mt-4 text-xl text-muted-foreground">Can general-purpose AI chatbots replace a specialized local SEO tool? We break down the pros and cons for managing your Google Business Profile.</p>
           </div>
         </div>

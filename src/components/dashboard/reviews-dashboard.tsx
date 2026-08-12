@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useMemo } from 'react';
@@ -6,8 +5,10 @@ import type { Review } from './review-list';
 import ReviewSummary from "./review-summary";
 import ReviewStats from "./review-stats";
 import ReviewList from "./review-list";
+import ReviewRequestKit from "./review-request-kit";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
+import { useDashboard } from "@/app/dashboard/dashboard-provider";
 
 interface ReviewsDashboardProps {
     reviews: Review[];
@@ -61,6 +62,7 @@ const NeedsReplyCard = ({ count }: { count: number }) => {
 
 
 export default function ReviewsDashboard({ reviews, accountId }: ReviewsDashboardProps) {
+    const { selectedLocation } = useDashboard();
     
     const reviewsToReplyCount = useMemo(() => {
         return (reviews || []).filter(r => !r.reviewReply).length;
@@ -80,11 +82,12 @@ export default function ReviewsDashboard({ reviews, accountId }: ReviewsDashboar
                 <ReviewList locationName={locationName} accountId={accountId} allReviews={reviews} isLoading={false} error={null} />
             </div>
             <div className="md:col-span-1 flex flex-col gap-8">
+                {selectedLocation?.details && (
+                  <ReviewRequestKit location={selectedLocation.details} reviews={reviews} />
+                )}
                 <ReviewStats reviews={reviews} isLoading={false} />
                 <NeedsReplyCard count={reviewsToReplyCount} />
             </div>
         </div>
     );
 }
-
-

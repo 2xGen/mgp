@@ -13,12 +13,12 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 const imageUrl = "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/AI-Powered%20Content%20Ideas%20for%20Your%20Google%20Posts.png";
 
 export const metadata: Metadata = {
-  title: 'AI-Powered Content Ideas for Your Google Posts',
-  description: 'Five AI-powered content ideas for Google Posts: products, seasonal posts, FAQs, offers, and testimonials. Prompt examples and why consistency matters.',
+  title: 'What to Post on Google Business Profile: AI Content Ideas',
+  description: 'What to post on Google Business Profile: product highlights, seasonal posts, FAQs, offers, and testimonials — with AI prompts so you never run out of Google Posts ideas.',
   keywords: ['google posts ideas', 'AI content ideas GBP', 'what to post on Google Business Profile', 'GBP posts'],
   openGraph: {
-    title: 'AI-Powered Content Ideas for Your Google Posts',
-    description: 'Never run out of things to post on your GBP again. This guide provides actionable content ideas you can generate with AI.',
+    title: 'What to Post on Google Business Profile: AI Content Ideas',
+    description: 'What to post on Google Business Profile: product highlights, seasonal posts, FAQs, offers, and testimonials — with AI prompts so you never run out of Google Posts ideas.',
     url: '/resources/ai-powered-content-ideas-for-google-posts',
     siteName: 'MyGoProfile',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AI-Powered Content Ideas for Your Google Posts',
-    description: 'Never run out of things to post on your GBP again. This guide provides actionable content ideas you can generate with AI.',
+    title: 'What to Post on Google Business Profile: AI Content Ideas',
+    description: 'What to post on Google Business Profile: product highlights, seasonal posts, FAQs, offers, and testimonials — with AI prompts so you never run out of Google Posts ideas.',
     images: [imageUrl],
   },
 }
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: 'AI-Powered Content Ideas for Your Google Posts',
-  description: 'Never run out of things to post on your Google Business Profile again. This guide provides actionable content ideas you can generate with AI to keep your profile fresh and engaging.',
+  headline: 'What to Post on Google Business Profile (AI Content Ideas)',
+  description: 'What to post on Google Business Profile: product highlights, seasonal posts, FAQs, offers, and testimonials — with AI prompts so you never run out of Google Posts ideas.',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -184,7 +184,7 @@ export default function BlogPost() {
                 className="mb-8"
             />
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">AI-Powered Content Ideas for Your Google Posts</h1>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">What to Post on Google Business Profile (AI Content Ideas)</h1>
             <p className="lead mt-4 text-xl text-muted-foreground">Staring at a blank screen? Here’s how to use AI to generate an endless supply of relevant, engaging content ideas for your Google Business Profile posts.</p>
           </div>
         </div>

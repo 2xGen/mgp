@@ -1,309 +1,409 @@
-
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Globe, Phone, Map, Star, MessageSquare, Calendar, CheckCircle2, AlertTriangle, XCircle, MousePointerClick, Info, HelpCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Eye,
+  Globe,
+  Phone,
+  Map,
+  Star,
+  Calendar,
+  MousePointerClick,
+  ArrowDownRight,
+  ArrowUpRight,
+  Minus,
+  ArrowRight,
+  Camera,
+  MessageSquare,
+} from "lucide-react";
 import { formatDistanceToNow, differenceInDays } from "date-fns";
 import type { Review } from "./review-list";
 import type { Question } from "./question-list";
 import type { LocationDetailsData } from "@/app/dashboard/dashboard-provider";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import RecentReviews from "./recent-reviews";
+import { useDashboard } from "@/app/dashboard/dashboard-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import AiSummary from "./ai-summary";
-
+import ActionRecommendations, { type Recommendation } from "./action-recommendations";
+import ActivityFeed from "./activity-feed";
+import ProfileHealth from "./profile-health";
+import ReviewRequestKit from "./review-request-kit";
 
 interface MasterDashboardProps {
-    userId: string;
-    location: LocationDetailsData;
-    currentPerformance: any[];
-    previousPerformance: any[];
-    posts: any[];
-    reviews: Review[];
-    questions: Question[];
-    currentPeriodReviews: Review[];
-    previousPeriodReviews: Review[];
+  userId: string;
+  location: LocationDetailsData;
+  currentPerformance: any[];
+  previousPerformance: any[];
+  posts: any[];
+  reviews: Review[];
+  questions: Question[];
+  currentPeriodReviews: Review[];
+  previousPeriodReviews: Review[];
 }
 
-const RATING_MAP: { [key in Review['starRating']]: number } = {
-    'FIVE': 5, 'FOUR': 4, 'THREE': 3, 'TWO': 2, 'ONE': 1, 'STAR_RATING_UNSPECIFIED': 0
+const RATING_MAP: { [key in Review["starRating"]]: number } = {
+  FIVE: 5,
+  FOUR: 4,
+  THREE: 3,
+  TWO: 2,
+  ONE: 1,
+  STAR_RATING_UNSPECIFIED: 0,
 };
 
 const METRIC_CONFIG = {
-    VIEWS: ['BUSINESS_IMPRESSIONS_DESKTOP_MAPS', 'BUSINESS_IMPRESSIONS_MOBILE_MAPS', 'BUSINESS_IMPRESSIONS_DESKTOP_SEARCH', 'BUSINESS_IMPRESSIONS_MOBILE_SEARCH'],
-    WEBSITE: ['WEBSITE_CLICKS'],
-    CALLS: ['CALL_CLICKS'],
-    DIRECTIONS: ['BUSINESS_DIRECTION_REQUESTS'],
+  VIEWS: [
+    "BUSINESS_IMPRESSIONS_DESKTOP_MAPS",
+    "BUSINESS_IMPRESSIONS_MOBILE_MAPS",
+    "BUSINESS_IMPRESSIONS_DESKTOP_SEARCH",
+    "BUSINESS_IMPRESSIONS_MOBILE_SEARCH",
+  ],
+  WEBSITE: ["WEBSITE_CLICKS"],
+  CALLS: ["CALL_CLICKS"],
+  DIRECTIONS: ["BUSINESS_DIRECTION_REQUESTS"],
 };
-
 
 const getMetricTotal = (data: any[], metrics: string[]): number => {
-    if (!data || data.length === 0) return 0;
-    
-    // Adjust logic to handle single object vs array of objects
-    const dataArray = Array.isArray(data) ? data : [data];
-
-    let total = 0;
-    const allTimeSeries = dataArray.flatMap(d => d.dailyMetricTimeSeries || []);
-    const relevantSeries = allTimeSeries.filter((ts: any) => metrics.includes(ts.dailyMetric));
-
-    for (const series of relevantSeries) {
-        if (series.timeSeries && series.timeSeries.datedValues) {
-            total += series.timeSeries.datedValues.reduce((sum: number, day: any) => sum + parseInt(day.value || '0', 10), 0);
-        }
+  if (!data || data.length === 0) return 0;
+  const dataArray = Array.isArray(data) ? data : [data];
+  let total = 0;
+  const allTimeSeries = dataArray.flatMap((d) => d.dailyMetricTimeSeries || []);
+  const relevantSeries = allTimeSeries.filter((ts: any) => metrics.includes(ts.dailyMetric));
+  for (const series of relevantSeries) {
+    if (series.timeSeries && series.timeSeries.datedValues) {
+      total += series.timeSeries.datedValues.reduce(
+        (sum: number, day: any) => sum + parseInt(day.value || "0", 10),
+        0
+      );
     }
-    return total;
+  }
+  return total;
 };
 
-const calculateReviewStats = (reviews: Review[]) => {
-    if (!reviews || reviews.length === 0) return { average: 0, count: 0 };
-    
-    const totalRating = reviews.reduce((sum, review) => sum + (RATING_MAP[review.starRating] || 0), 0);
-    return { average: totalRating / reviews.length, count: reviews.length };
-};
+function ChangeBadge({ change, isPercentPoint = false }: { change: number; isPercentPoint?: boolean }) {
+  if (!isFinite(change)) {
+    return <span className="text-xs text-muted-foreground">new</span>;
+  }
+  const Icon = change === 0 ? Minus : change > 0 ? ArrowUpRight : ArrowDownRight;
+  const color =
+    change > 0 ? "text-emerald-600" : change < 0 ? "text-destructive" : "text-muted-foreground";
+  const value = isPercentPoint
+    ? `${change > 0 ? "+" : ""}${change.toFixed(1)} pts`
+    : `${change > 0 ? "+" : ""}${change.toFixed(0)}%`;
+  return (
+    <span className={`inline-flex items-center text-xs font-medium ${color}`}>
+      <Icon className="mr-0.5 h-3.5 w-3.5" />
+      {value}
+    </span>
+  );
+}
 
+function SnapshotMetric({
+  label,
+  value,
+  change,
+  icon: Icon,
+  isPercentage = false,
+}: {
+  label: string;
+  value: number;
+  change: number;
+  icon: React.ElementType;
+  isPercentage?: boolean;
+}) {
+  return (
+    <div className="rounded-xl border bg-card p-3">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs font-medium text-muted-foreground">{label}</p>
+        <Icon className="h-3.5 w-3.5 text-muted-foreground" />
+      </div>
+      <p className="mt-1 text-xl font-semibold tabular-nums">
+        {isPercentage ? `${value.toFixed(1)}%` : value.toLocaleString()}
+      </p>
+      <div className="mt-0.5">
+        <ChangeBadge change={change} isPercentPoint={isPercentage} />
+      </div>
+    </div>
+  );
+}
 
-const PerformanceStatCard = ({ title, value, change, icon: Icon, isRating = false, isPercentage = false, tooltipText }: { title: string, value: number, change: number | null, icon: React.ElementType, isRating?: boolean, isPercentage?: boolean, tooltipText?: string }) => (
-    <Card className="shadow-sm">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div className="flex items-center gap-2">
-                <CardTitle className="text-sm font-medium">{title}</CardTitle>
-                {tooltipText && (
-                    <Tooltip>
-                        <TooltipTrigger>
-                            <Info className="h-3 w-3 text-muted-foreground" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p className="text-xs">{tooltipText}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                )}
-            </div>
-            <Icon className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-            <div className="text-2xl font-bold">
-                {isRating ? value.toFixed(1) : isPercentage ? `${value.toFixed(1)}%` : value.toLocaleString()}
-            </div>
-            {change !== null && change !== undefined && isFinite(change) ? (
-                <p className={`text-xs ${change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {`${change > 0 ? '+' : ''}${(isRating || isPercentage) ? change.toFixed(1) : parseFloat(change.toFixed(0)).toLocaleString()}%`} vs previous 30 days
-                </p>
-            ) : (
-                 <p className="text-xs text-muted-foreground">-- vs previous 30 days</p>
-            )}
-        </CardContent>
-    </Card>
-);
+export default function MasterDashboard({
+  userId,
+  location,
+  currentPerformance,
+  previousPerformance,
+  posts,
+  reviews,
+  questions: _questions,
+  currentPeriodReviews,
+  previousPeriodReviews: _previousPeriodReviews,
+}: MasterDashboardProps) {
+  const { setActiveTab } = useDashboard();
+  const [topActions, setTopActions] = useState<Recommendation[]>([]);
 
-export default function MasterDashboard({ userId, location, currentPerformance, previousPerformance, posts, reviews, questions, currentPeriodReviews, previousPeriodReviews }: MasterDashboardProps) {
-    const aggregatedStats = useMemo(() => {
-        // Performance
-        const currentViews = getMetricTotal(currentPerformance, METRIC_CONFIG.VIEWS);
-        const previousViews = getMetricTotal(previousPerformance, METRIC_CONFIG.VIEWS);
-        const viewsChange = previousViews > 0 ? ((currentViews - previousViews) / previousViews) * 100 : currentViews > 0 ? Infinity : 0;
+  const handleRecs = useCallback((recs: Recommendation[]) => {
+    setTopActions(recs);
+  }, []);
 
-        const currentWebsite = getMetricTotal(currentPerformance, METRIC_CONFIG.WEBSITE);
-        const previousWebsite = getMetricTotal(previousPerformance, METRIC_CONFIG.WEBSITE);
-        const websiteChange = previousWebsite > 0 ? ((currentWebsite - previousWebsite) / previousWebsite) * 100 : currentWebsite > 0 ? Infinity : 0;
-        
-        const currentCalls = getMetricTotal(currentPerformance, METRIC_CONFIG.CALLS);
-        const previousCalls = getMetricTotal(previousPerformance, METRIC_CONFIG.CALLS);
-        const callsChange = previousCalls > 0 ? ((currentCalls - previousCalls) / previousCalls) * 100 : currentCalls > 0 ? Infinity : 0;
+  const stats = useMemo(() => {
+    const currentViews = getMetricTotal(currentPerformance, METRIC_CONFIG.VIEWS);
+    const previousViews = getMetricTotal(previousPerformance, METRIC_CONFIG.VIEWS);
+    const viewsChange =
+      previousViews > 0
+        ? ((currentViews - previousViews) / previousViews) * 100
+        : currentViews > 0
+          ? Infinity
+          : 0;
 
-        const currentDirections = getMetricTotal(currentPerformance, METRIC_CONFIG.DIRECTIONS);
-        const previousDirections = getMetricTotal(previousPerformance, METRIC_CONFIG.DIRECTIONS);
-        const directionsChange = previousDirections > 0 ? ((currentDirections - previousDirections) / previousDirections) * 100 : currentDirections > 0 ? Infinity : 0;
-        
-        // Engagement Rate
-        const currentTotalClicks = currentWebsite + currentCalls + currentDirections;
-        const currentEngagementRate = currentViews > 0 ? (currentTotalClicks / currentViews) * 100 : 0;
-        
-        const previousTotalClicks = previousWebsite + previousCalls + previousDirections;
-        const previousEngagementRate = previousViews > 0 ? (previousTotalClicks / previousViews) * 100 : 0;
-        
-        const engagementRateChange = previousEngagementRate > 0 ? ((currentEngagementRate - previousEngagementRate) / previousEngagementRate) * 100 : currentEngagementRate > 0 ? Infinity : 0;
+    const currentWebsite = getMetricTotal(currentPerformance, METRIC_CONFIG.WEBSITE);
+    const previousWebsite = getMetricTotal(previousPerformance, METRIC_CONFIG.WEBSITE);
+    const websiteChange =
+      previousWebsite > 0
+        ? ((currentWebsite - previousWebsite) / previousWebsite) * 100
+        : currentWebsite > 0
+          ? Infinity
+          : 0;
 
-        // Posts Recency
-        const mostRecentPost = posts && posts.length > 0
-            ? posts.reduce((latest: any, post: any) => new Date(post.createTime) > new Date(latest.createTime) ? post : latest)
-            : null;
-        
-        let postRecency: { status: 'good' | 'warning' | 'bad' | 'none', message: string, Icon: React.ElementType, detail: string };
-        if (!mostRecentPost) {
-            postRecency = { status: 'none', message: "No posts yet", Icon: Calendar, detail: "Create a post to engage with customers." };
-        } else {
-            const daysSincePost = differenceInDays(new Date(), new Date(mostRecentPost.createTime));
-            const distance = formatDistanceToNow(new Date(mostRecentPost.createTime), { addSuffix: true });
-            if (daysSincePost < 14) {
-                 postRecency = { status: 'good', message: `Fresh post`, Icon: CheckCircle2, detail: `Posted ${distance}` };
-            } else if (daysSincePost <= 28) {
-                postRecency = { status: 'warning', message: "Post getting old", Icon: AlertTriangle, detail: `Last post was ${distance}` };
-            } else {
-                postRecency = { status: 'bad', message: "Post is stale", Icon: XCircle, detail: "Post an update!" };
+    const currentCalls = getMetricTotal(currentPerformance, METRIC_CONFIG.CALLS);
+    const previousCalls = getMetricTotal(previousPerformance, METRIC_CONFIG.CALLS);
+    const callsChange =
+      previousCalls > 0
+        ? ((currentCalls - previousCalls) / previousCalls) * 100
+        : currentCalls > 0
+          ? Infinity
+          : 0;
+
+    const currentDirections = getMetricTotal(currentPerformance, METRIC_CONFIG.DIRECTIONS);
+    const previousDirections = getMetricTotal(previousPerformance, METRIC_CONFIG.DIRECTIONS);
+    const directionsChange =
+      previousDirections > 0
+        ? ((currentDirections - previousDirections) / previousDirections) * 100
+        : currentDirections > 0
+          ? Infinity
+          : 0;
+
+    const currentTotalClicks = currentWebsite + currentCalls + currentDirections;
+    const currentEngagementRate = currentViews > 0 ? (currentTotalClicks / currentViews) * 100 : 0;
+    const previousTotalClicks = previousWebsite + previousCalls + previousDirections;
+    const previousEngagementRate = previousViews > 0 ? (previousTotalClicks / previousViews) * 100 : 0;
+    const engagementRateChange =
+      previousEngagementRate > 0
+        ? ((currentEngagementRate - previousEngagementRate) / previousEngagementRate) * 100
+        : currentEngagementRate > 0
+          ? Infinity
+          : 0;
+
+    const mostRecentPost =
+      posts && posts.length > 0
+        ? posts.reduce((latest: any, post: any) =>
+            new Date(post.createTime) > new Date(latest.createTime) ? post : latest
+          )
+        : null;
+    const daysSincePost = mostRecentPost
+      ? differenceInDays(new Date(), new Date(mostRecentPost.createTime))
+      : null;
+
+    const totalReviews = reviews?.length || 0;
+    const avgRating =
+      totalReviews > 0
+        ? reviews.reduce((s, r) => s + (RATING_MAP[r.starRating] || 0), 0) / totalReviews
+        : 0;
+    const newReviews30d = currentPeriodReviews?.length || 0;
+    const unanswered = (reviews || []).filter((r) => !r.reviewReply).length;
+
+    return {
+      currentViews,
+      viewsChange,
+      currentWebsite,
+      websiteChange,
+      currentCalls,
+      callsChange,
+      currentDirections,
+      directionsChange,
+      currentEngagementRate,
+      engagementRateChange,
+      mostRecentPost,
+      daysSincePost,
+      totalReviews,
+      avgRating,
+      newReviews30d,
+      unanswered,
+    };
+  }, [currentPerformance, previousPerformance, posts, reviews, currentPeriodReviews]);
+
+  const recentReviews = useMemo(() => {
+    if (!reviews) return [];
+    return [...reviews]
+      .sort((a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime())
+      .slice(0, 5);
+  }, [reviews]);
+
+  const showReviewKit = topActions.some((r) => r.id === "get-reviews");
+
+  const postStatus =
+    !stats.mostRecentPost || stats.daysSincePost === null
+      ? { label: "No posts yet", tone: "text-destructive" as const }
+      : stats.daysSincePost > 28
+        ? {
+            label: `Last post ${formatDistanceToNow(new Date(stats.mostRecentPost.createTime), { addSuffix: true })}`,
+            tone: "text-destructive" as const,
+          }
+        : stats.daysSincePost > 14
+          ? {
+              label: `Last post ${formatDistanceToNow(new Date(stats.mostRecentPost.createTime), { addSuffix: true })}`,
+              tone: "text-amber-600" as const,
             }
-        }
-            
-        // Reviews
-        const currentReviewStats = calculateReviewStats(currentPeriodReviews);
-        const previousReviewStats = calculateReviewStats(previousPeriodReviews);
+          : {
+              label: `Posted ${formatDistanceToNow(new Date(stats.mostRecentPost.createTime), { addSuffix: true })}`,
+              tone: "text-emerald-600" as const,
+            };
 
-        const reviewCountChange = previousReviewStats.count > 0 ? ((currentReviewStats.count - previousReviewStats.count) / previousReviewStats.count) * 100 : currentReviewStats.count > 0 ? Infinity : 0;
-        const avgRatingChange = previousReviewStats.average > 0 ? ((currentReviewStats.average - previousReviewStats.average) / previousReviewStats.average) * 100 : currentReviewStats.average > 0 ? Infinity : 0;
-        
-        const mostRecentReview = reviews && reviews.length > 0
-            ? reviews.reduce((latest, review) => new Date(review.createTime) > new Date(latest.createTime) ? review : latest)
-            : null;
-            
-        let reviewRecencyMessage = "";
-        if (mostRecentReview) {
-            const daysSinceReview = differenceInDays(new Date(), new Date(mostRecentReview.createTime));
-             if (daysSinceReview < 14) {
-                reviewRecencyMessage = "You’re getting recent feedback!";
-            } else if (daysSinceReview > 90) {
-                reviewRecencyMessage = "Ask customers for new reviews to stay current.";
-            }
-        }
+  return (
+    <TooltipProvider>
+      <div className="flex flex-col gap-6">
+        <ProfileHealth
+          location={location}
+          reviews={reviews}
+          posts={posts}
+          viewsChange={stats.viewsChange}
+          variant="compact"
+        />
 
-        // Reviews needing response
-        const reviewsToReplyCount = (reviews || []).filter(r => !r.reviewReply).length;
-        let reviewsToReply: { status: 'good' | 'warning' | 'bad', message: string, Icon: React.ElementType, detail: string };
-        if (reviewsToReplyCount === 0) {
-            reviewsToReply = { status: 'good', message: 'All caught up!', Icon: CheckCircle2, detail: 'You have responded to all reviews.' };
-        } else if (reviewsToReplyCount <= 5) {
-            reviewsToReply = { status: 'warning', message: `${reviewsToReplyCount} to reply`, Icon: AlertTriangle, detail: `review${reviewsToReplyCount > 1 ? 's' : ''} need${reviewsToReplyCount === 1 ? 's' : ''} a response` };
-        } else {
-            reviewsToReply = { status: 'bad', message: `${reviewsToReplyCount} to reply`, Icon: XCircle, detail: `${reviewsToReplyCount} reviews need a response.` };
-        }
+        <ActionRecommendations
+          location={location}
+          reviews={reviews}
+          posts={posts}
+          viewsChange={stats.viewsChange}
+          websiteChange={stats.websiteChange}
+          callsChange={stats.callsChange}
+          onRecommendationsChange={handleRecs}
+        />
 
-        return {
-            performance: [
-                { title: "Total Views", value: currentViews, change: viewsChange, icon: Eye },
-                { title: "Engagement Rate", value: currentEngagementRate, change: engagementRateChange, icon: MousePointerClick, isPercentage: true, tooltipText: "(Clicks + Calls + Directions) / Total Views" },
-                { title: "Website Clicks", value: currentWebsite, change: websiteChange, icon: Globe },
-                { title: "Phone Calls", value: currentCalls, change: callsChange, icon: Phone },
-                { title: "Direction Requests", value: currentDirections, change: directionsChange, icon: Map }
-            ],
-            reviews: [
-                 { title: "New Reviews (Last 30d)", value: currentReviewStats.count, change: reviewCountChange, icon: MessageSquare },
-                 { title: "Average Rating (Last 30d)", value: currentReviewStats.average, change: avgRatingChange, icon: Star, isRating: true },
-            ],
-            postRecency,
-            reviewRecencyMessage,
-            reviewsToReply,
-        };
-    }, [currentPerformance, previousPerformance, posts, reviews, questions, currentPeriodReviews, previousPeriodReviews]);
+        <AiSummary
+          userId={userId}
+          location={location}
+          currentPerformance={currentPerformance}
+          previousPerformance={previousPerformance}
+          recentReviews={recentReviews}
+          compact
+        />
 
-    const getStatusColor = (status: 'good' | 'warning' | 'bad' | 'none') => {
-        switch (status) {
-            case 'good': return 'text-green-600';
-            case 'warning': return 'text-yellow-600';
-            case 'bad': return 'text-red-600';
-            default: return 'text-muted-foreground';
-        }
-    }
-
-    const recentReviews = useMemo(() => {
-        if (!reviews) return [];
-        return [...reviews]
-            .sort((a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime())
-            .slice(0, 5);
-    }, [reviews]);
-
-    return (
-        <TooltipProvider>
-            <div className="flex flex-col gap-6">
-                <div className="space-y-6">
-                     <AiSummary 
-                        userId={userId}
-                        location={location}
-                        currentPerformance={currentPerformance}
-                        previousPerformance={previousPerformance}
-                        recentReviews={recentReviews}
-                    />
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Location Summary: {location.title}</CardTitle>
-                            <CardDescription>Aggregated data from this business location for the last 30 days.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="space-y-2">
-                                <h3 className="text-md font-medium text-muted-foreground">Performance vs. Previous 30 Days</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {aggregatedStats.performance.map(stat => <PerformanceStatCard key={stat.title} {...stat} />)}
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                         <div className="space-y-2">
-                            <div className="flex justify-between items-center">
-                                <h3 className="text-md font-medium text-muted-foreground">Reviews vs. Previous 30 Days</h3>
-                                {aggregatedStats.reviewRecencyMessage && <p className="text-xs text-muted-foreground">{aggregatedStats.reviewRecencyMessage}</p>}
-                            </div>
-                            <div className="grid grid-cols-1 gap-4">
-                            {aggregatedStats.reviews.map(stat => <PerformanceStatCard key={stat.title} {...stat} />)}
-                            </div>
-                        </div>
-                         <div className="space-y-2">
-                            <h3 className="text-md font-medium text-muted-foreground">Recent Activity</h3>
-                            <div className="grid grid-cols-1 gap-4">
-                                <Card className="shadow-sm">
-                                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <div className="flex items-center gap-2">
-                                            <CardTitle className="text-sm font-medium">Post Recency</CardTitle>
-                                             <Tooltip>
-                                                <TooltipTrigger>
-                                                    <Info className="h-3 w-3 text-muted-foreground" />
-                                                </TooltipTrigger>
-                                                <TooltipContent>
-                                                    <div className="text-xs space-y-1 p-1">
-                                                        <p className="flex items-center"><CheckCircle2 className="h-3 w-3 mr-2 text-green-500"/> Fresh: &lt; 2 weeks</p>
-                                                        <p className="flex items-center"><AlertTriangle className="h-3 w-3 mr-2 text-yellow-500"/> Warning: 2-4 weeks</p>
-                                                        <p className="flex items-center"><XCircle className="h-3 w-3 mr-2 text-red-500"/> Stale: &gt; 4 weeks</p>
-                                                    </div>
-                                                </TooltipContent>
-                                            </Tooltip>
-                                        </div>
-                                        <aggregatedStats.postRecency.Icon className={`h-4 w-4 ${getStatusColor(aggregatedStats.postRecency.status)}`} />
-                                </CardHeader>
-                                <CardContent>
-                                    <div className={`text-2xl font-bold ${getStatusColor(aggregatedStats.postRecency.status)}`}>
-                                        {aggregatedStats.postRecency.message}
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">
-                                    {aggregatedStats.postRecency.detail}
-                                    </p>
-                                </CardContent>
-                            </Card>
-                             <Card className="shadow-sm">
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium">Reviews to Reply</CardTitle>
-                                    <aggregatedStats.reviewsToReply.Icon className={`h-4 w-4 ${getStatusColor(aggregatedStats.reviewsToReply.status)}`} />
-                                </CardHeader>
-                                <CardContent>
-                                    <div className={`text-2xl font-bold ${getStatusColor(aggregatedStats.reviewsToReply.status)}`}>
-                                        {aggregatedStats.reviewsToReply.message}
-                                    </div>
-                                    <p className="text-xs text-muted-foreground">
-                                        {aggregatedStats.reviewsToReply.detail}
-                                    </p>
-                                </CardContent>
-                            </Card>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="w-full">
-                    <RecentReviews reviews={reviews} />
-                </div>
+        <Card className="shadow-sm">
+          <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0 pb-3">
+            <div>
+              <CardTitle className="text-lg">Performance</CardTitle>
+              <CardDescription>Last 30 days vs prior 30 days</CardDescription>
             </div>
-        </TooltipProvider>
-    );
+            <Button variant="outline" size="sm" onClick={() => setActiveTab("performance")}>
+              View performance
+              <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+            </Button>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+              <SnapshotMetric
+                label="Profile views"
+                value={stats.currentViews}
+                change={stats.viewsChange}
+                icon={Eye}
+              />
+              <SnapshotMetric
+                label="Engagement"
+                value={stats.currentEngagementRate}
+                change={stats.engagementRateChange}
+                icon={MousePointerClick}
+                isPercentage
+              />
+              <SnapshotMetric
+                label="Website clicks"
+                value={stats.currentWebsite}
+                change={stats.websiteChange}
+                icon={Globe}
+              />
+              <SnapshotMetric
+                label="Calls"
+                value={stats.currentCalls}
+                change={stats.callsChange}
+                icon={Phone}
+              />
+              <SnapshotMetric
+                label="Directions"
+                value={stats.currentDirections}
+                change={stats.directionsChange}
+                icon={Map}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid gap-6 lg:grid-cols-2">
+          <Card className="shadow-sm">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <Star className="h-5 w-5 fill-amber-400 text-amber-400" />
+                <CardTitle className="text-lg">Reviews</CardTitle>
+              </div>
+              <CardDescription>
+                {stats.avgRating ? `${stats.avgRating.toFixed(1)}★` : "—"} · {stats.totalReviews}{" "}
+                total · {stats.newReviews30d} new this month
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                {stats.unanswered === 0
+                  ? "No reviews waiting for a reply."
+                  : `${stats.unanswered} review${stats.unanswered === 1 ? "" : "s"} need a response.`}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="secondary" onClick={() => setActiveTab("reviews")}>
+                  <MessageSquare className="mr-1.5 h-4 w-4" />
+                  {stats.unanswered > 0 ? "Reply with AI" : "View all reviews"}
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => setActiveTab("reviews")}>
+                  Get more reviews
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-sm">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg">Activity</CardTitle>
+              <CardDescription>Keep Google seeing a living profile</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between gap-3 rounded-lg border p-3">
+                <div className="flex items-center gap-3">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Posts</p>
+                    <p className={`text-xs ${postStatus.tone}`}>{postStatus.label}</p>
+                  </div>
+                </div>
+                <Button size="sm" variant="secondary" onClick={() => setActiveTab("posts")}>
+                  Create with AI
+                </Button>
+              </div>
+              <div className="flex items-center justify-between gap-3 rounded-lg border p-3">
+                <div className="flex items-center gap-3">
+                  <Camera className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Photos</p>
+                    <p className="text-xs text-muted-foreground">Manage gallery & upload fresh shots</p>
+                  </div>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => setActiveTab("media")}>
+                  Manage photos
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {showReviewKit && <ReviewRequestKit location={location} reviews={reviews} />}
+
+        <ActivityFeed />
+      </div>
+    </TooltipProvider>
+  );
 }

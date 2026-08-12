@@ -75,7 +75,22 @@ export default function LocalPostsList({ locationName }: LocalPostsListProps) {
                 setError(result.error);
             } else if (result.data) {
                 const data: LocalPostsData = result.data;
-                setPosts(prev => [...prev, ...(data.localPosts || [])]);
+                const incoming = data.localPosts || [];
+                // Replace on first page; merge+dedupe on pagination / Strict Mode double-fetch.
+                setPosts((prev) => {
+                  if (!token) {
+                    const byName = new Map<string, LocalPost>();
+                    for (const post of incoming) {
+                      if (post?.name) byName.set(post.name, post);
+                    }
+                    return Array.from(byName.values());
+                  }
+                  const byName = new Map(prev.map((p) => [p.name, p]));
+                  for (const post of incoming) {
+                    if (post?.name) byName.set(post.name, post);
+                  }
+                  return Array.from(byName.values());
+                });
                 setNextPageToken(data.nextPageToken);
             }
         } catch (e: any) {
@@ -97,8 +112,11 @@ export default function LocalPostsList({ locationName }: LocalPostsListProps) {
     };
     
     const handlePostCreated = (newPost: LocalPost) => {
-        // Add the new post to the top of the list
-        setPosts(prevPosts => [newPost, ...prevPosts]);
+        if (!newPost?.name) return;
+        setPosts((prevPosts) => {
+          if (prevPosts.some((p) => p.name === newPost.name)) return prevPosts;
+          return [newPost, ...prevPosts];
+        });
     };
     
     const handleDeletePost = async (postName: string) => {
@@ -148,8 +166,8 @@ export default function LocalPostsList({ locationName }: LocalPostsListProps) {
 
         return (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
-                {posts.map((post) => (
-                    <Card key={post.name} className="h-full flex flex-col hover:shadow-lg transition-shadow relative group/post">
+                {posts.map((post, index) => (
+                    <Card key={post.name || `post-${index}`} className="h-full flex flex-col hover:shadow-lg transition-shadow relative group/post">
                          <CardHeader>
                             <div className="flex justify-between items-start">
                                 <div className="flex flex-col gap-2">

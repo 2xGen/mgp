@@ -13,12 +13,12 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 const imageUrl = "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/how%20often%20should%20you%20post.png";
 
 export const metadata: Metadata = {
-  title: 'How Often Should You Update Photos on Your GBP?',
-  description: 'How often to update photos on GBP: aim for at least one new photo every 7–10 days. Why photo frequency matters for local SEO and what types of photos to add.',
-  keywords: ['how often to update photos on gbp', 'how often to add photos to google business profile', 'gbp photo frequency', 'google business profile photos', 'update gbp photos', 'local seo photos'],
+  title: 'How Often to Upload Photos to Google Business Profile (7–10 Days)',
+  description: 'Recommended frequency for uploading photos to Google Business Profile: at least one new photo every 7–10 days. Why it matters for GBP photo optimization and local SEO.',
+  keywords: ['recommended frequency for uploading photos to google business profile', 'how often to upload photos to google business profile', 'how often should i upload photos to my google business profile', 'photo optimization gbp', 'gbp photo optimization', 'how often to update photos on gbp', 'how often to add photos to google business profile', 'gbp photo frequency', 'google business profile photos', 'update gbp photos', 'local seo photos'],
   openGraph: {
-    title: 'How Often Should You Update Photos on Your GBP?',
-    description: 'Aim for one new photo every 7–10 days. Why it matters for local SEO and what types of photos to add.',
+    title: 'How Often to Upload Photos to Google Business Profile (7–10 Days)',
+    description: 'Recommended frequency for uploading photos to Google Business Profile: at least one new photo every 7–10 days. Why it matters for GBP photo optimization and local SEO.',
     url: '/resources/how-often-to-update-photos-on-gbp',
     siteName: 'MyGoProfile',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How Often Should You Update Photos on Your GBP?',
-    description: 'One new photo every 7–10 days. Why it matters and what types to add.',
+    title: 'How Often to Upload Photos to Google Business Profile (7–10 Days)',
+    description: 'Recommended frequency for uploading photos to Google Business Profile: at least one new photo every 7–10 days. Why it matters for GBP photo optimization and local SEO.',
     images: [imageUrl],
   },
 }
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: 'How Often Should You Update Photos on Your GBP?',
-  description: 'How often to update photos on GBP: aim for one new photo every 7–10 days. Why photo frequency matters for local SEO and what types of photos to add.',
+  headline: 'How Often Should You Upload Photos to Google Business Profile?',
+  description: 'Recommended frequency for uploading photos to Google Business Profile: at least one new photo every 7–10 days. Why it matters for GBP photo optimization and local SEO.',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -200,7 +200,7 @@ export default function BlogPost() {
                 className="mb-8"
             />
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">How Often Should You Update Photos on Your GBP?</h1>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">How Often Should You Upload Photos to Google Business Profile?</h1>
             <p className="lead mt-4 text-xl text-muted-foreground">It’s a simple question with a powerful impact on your local SEO. We break down the ideal photo upload frequency for your Google Business Profile.</p>
           </div>
         </div>

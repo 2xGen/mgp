@@ -15,12 +15,12 @@ const imageUrl = "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/pub
 const canonicalPath = '/resources/google-business-profile-optimization';
 
 export const metadata: Metadata = {
-  title: 'The Complete Guide to Google Business Profile Optimization',
-  description: 'Step-by-step GBP optimization: NAP, photos, reviews, Q&A, posts. Best practices that work. Dominate local search.',
-  keywords: ['Google Business Profile optimization', 'GBP optimization', 'GBP best practices', 'google business profile optimization tips', 'google business profile categories', 'google business profile posts best practices', 'local SEO', 'google my business optimization'],
+  title: 'GBP Optimization Guide 2026: Complete Google Business Profile Checklist',
+  description: 'GBP optimization best practices 2026: NAP, categories, photos, reviews, posts, Q&A. Step-by-step Google Business Profile optimization tips that still work.',
+  keywords: ['gbp guide 2026', 'gbp optimization', 'gbp optimization guides', 'google business profile optimization tips 2026', 'google business profile optimization best practices 2026', 'google my business optimization tips 2026', 'Google Business Profile optimization', 'GBP best practices', 'google business profile categories', 'google business profile posts best practices', 'local SEO', 'google my business optimization'],
   openGraph: {
-    title: 'The Complete Guide to Google Business Profile Optimization',
-    description: 'Step-by-step GBP optimization that works. NAP, photos, reviews, posts.',
+    title: 'GBP Optimization Guide 2026: Complete Google Business Profile Checklist',
+    description: 'GBP optimization best practices 2026: NAP, categories, photos, reviews, posts, Q&A. Step-by-step Google Business Profile optimization tips that still work.',
     url: canonicalPath,
     siteName: 'MyGoProfile',
     images: [
@@ -38,8 +38,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'The Complete Guide to Google Business Profile Optimization',
-    description: 'Step-by-step GBP optimization: NAP, photos, reviews, Q&A, posts. Best practices that work.',
+    title: 'GBP Optimization Guide 2026: Complete Google Business Profile Checklist',
+    description: 'GBP optimization best practices 2026: NAP, categories, photos, reviews, posts, Q&A. Step-by-step Google Business Profile optimization tips that still work.',
     images: [imageUrl],
   },
 }
@@ -47,8 +47,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: 'The Complete Guide to Google Business Profile Optimization',
-  description: 'A comprehensive guide to dominating local search. Learn how to optimize every aspect of your GBP, from core information and photos to Q&A and advanced SEO strategies.',
+  headline: 'GBP Optimization Guide 2026: Complete Google Business Profile Checklist',
+  description: 'GBP optimization best practices 2026: NAP, categories, photos, reviews, posts, Q&A. Step-by-step Google Business Profile optimization tips that still work.',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -246,7 +246,7 @@ export default function BlogPostPage() {
                 className="mb-8"
             />
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">The Complete Guide to Google Business Profile Optimization</h1>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">GBP Optimization Guide 2026: Complete Google Business Profile Checklist</h1>
             <p className="lead mt-4 text-xl text-muted-foreground">Transform your Google Business Profile into your most powerful customer acquisition tool. This comprehensive guide covers every aspect of GBP optimization to help you rank higher in local search and dominate your market in 2026.</p>
           </div>
         </div>

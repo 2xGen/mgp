@@ -75,39 +75,42 @@ const ChangeIndicator = ({ change }: { change: number | null }) => {
 
 export default function MultiLocationPreview() {
   return (
-    <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2 lg:gap-20">
-        <div className="flex flex-col items-start gap-4">
+    <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 lg:gap-16">
+        <div className="order-1 flex flex-col items-start gap-4 md:order-2">
             <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-                Unified Dashboard
+                Multi-location
             </div>
             <h2 className="font-headline text-3xl font-semibold tracking-tight md:text-4xl">
-                All Your Locations, <span className="bg-gradient-brand animate-gradient-flow bg-[length:400%_400%] bg-clip-text text-transparent">One Screen.</span>
+                All your locations,{' '}
+                <span className="bg-gradient-brand animate-gradient-flow bg-[length:400%_400%] bg-clip-text text-transparent">
+                  one screen
+                </span>
             </h2>
             <p className="text-lg text-muted-foreground">
-                Stop switching between accounts. Our platform brings all your Google Business Profiles into a single, elegant dashboard. Compare performance, manage reviews, and stay on top of your entire brand presence with ease.
+                Stop switching between Google accounts. Compare performance, catch locations that need replies, and manage every profile from one dashboard.
             </p>
              <ul className="space-y-2 text-muted-foreground">
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-brand-green" />
+                  <Check className="h-4 w-4 shrink-0 text-brand-green" />
                   No more logging in and out of multiple Google accounts.
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-brand-green" />
-                  Quickly identify top-performing and underperforming locations.
+                  <Check className="h-4 w-4 shrink-0 text-brand-green" />
+                  Spot top and underperforming locations fast.
                 </li>
                  <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-brand-green" />
-                  Gain a complete overview of your brand's local search health.
+                  <Check className="h-4 w-4 shrink-0 text-brand-green" />
+                  One overview of your brand&apos;s local search health.
                 </li>
               </ul>
-              <Link href="/pricing" className="mt-4 w-full">
-                <Button size="lg" variant="outline" className="w-full">
-                    Get Started for Free
+              <Link href="/login" className="mt-2">
+                <Button size="lg" variant="outline">
+                    Start free trial
                     <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
             </Link>
         </div>
-        <div className="shadow-2xl rounded-xl">
+        <div className="order-2 min-w-0 overflow-hidden rounded-xl shadow-xl shadow-primary/10 md:order-1">
              <Card>
                 <CardHeader>
                     <CardTitle>Locations Leaderboard</CardTitle>

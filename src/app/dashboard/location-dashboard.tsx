@@ -57,7 +57,7 @@ export default function LocationDashboard() {
                 return (
                     <div className="space-y-4">
                         <MasterDashboard
-                            userId={user.uid}
+                            userId={user.id}
                             location={currentLocationDetails}
                             currentPerformance={currentPerformance}
                             previousPerformance={previousPerformance}

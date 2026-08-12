@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useMemo } from 'react';
@@ -30,6 +29,36 @@ const StarRatingDisplay: React.FC<{ rating: Review['starRating'] }> = ({ rating 
         </div>
     );
 };
+
+function CompactReviewMedia({ review }: { review: Review }) {
+    const media = review.reviewMediaItems || review.reviewMediaItem || [];
+    if (!media.length) return null;
+    return (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+            {media.slice(0, 3).map((item, idx) => {
+                const src = item.thumbnailUrl || item.googleUrl || item.sourceUrl;
+                if (!src) return null;
+                return (
+                    <a
+                        key={idx}
+                        href={item.googleUrl || item.sourceUrl || src}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="relative h-12 w-12 overflow-hidden rounded-md border bg-muted"
+                    >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={src} alt="" className="h-full w-full object-cover" />
+                    </a>
+                );
+            })}
+            {media.length > 3 && (
+                <span className="flex h-12 w-12 items-center justify-center rounded-md border bg-muted text-xs text-muted-foreground">
+                    +{media.length - 3}
+                </span>
+            )}
+        </div>
+    );
+}
 
 export default function RecentReviews({ reviews }: RecentReviewsProps) {
     const { setActiveTab } = useDashboard();
@@ -69,6 +98,7 @@ export default function RecentReviews({ reviews }: RecentReviewsProps) {
                                     <p className="text-sm text-muted-foreground line-clamp-2">
                                         {review.comment}
                                     </p>
+                                    <CompactReviewMedia review={review} />
                                     <p className="text-xs text-muted-foreground/80">{formatDistanceToNow(new Date(review.createTime), { addSuffix: true })}</p>
                                 </div>
                             </div>

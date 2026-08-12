@@ -13,12 +13,12 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 const imageUrl = "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/How%20to%20Automate%20GBP%20Review%20Replies%20with%20AI.png";
 
 export const metadata: Metadata = {
-  title: 'How to Automate GBP Review Replies with AI (Safely)',
-  description: 'Use AI to draft Google review replies safely: human-in-the-loop, tonal options, and how to handle negative reviews without sounding robotic.',
-  keywords: ['automate google review replies', 'AI review reply', 'GBP review automation', 'safe AI for reviews', 'human in the loop reviews'],
+  title: 'Automate Review Replies for GBP: Pros, Cons & Safe AI Workflow',
+  description: 'Review response automation pros and cons. Use AI to draft Google review replies at scale without sounding robotic — human-in-the-loop GBP automation that keeps brand voice.',
+  keywords: ['review response automation pros', 'gbp automation', 'automate review replies', 'gbp ai bulk replies', 'gbp ai', 'automate google review replies', 'AI review reply', 'GBP review automation', 'safe AI for reviews', 'human in the loop reviews'],
   openGraph: {
-    title: 'How to Automate GBP Review Replies with AI (Safely)',
-    description: 'AI-drafted, human-approved replies. Best practices so you keep control and still save time.',
+    title: 'Automate Review Replies for GBP: Pros, Cons & Safe AI Workflow',
+    description: 'Review response automation pros and cons. Use AI to draft Google review replies at scale without sounding robotic — human-in-the-loop GBP automation that keeps brand voice.',
     url: '/resources/how-to-automate-gbp-review-replies-with-ai',
     siteName: 'MyGoProfile',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Automate GBP Review Replies with AI (Safely)',
-    description: 'AI drafts, you approve. Safe way to get to 100% response rate.',
+    title: 'Automate Review Replies for GBP: Pros, Cons & Safe AI Workflow',
+    description: 'Review response automation pros and cons. Use AI to draft Google review replies at scale without sounding robotic — human-in-the-loop GBP automation that keeps brand voice.',
     images: [imageUrl],
   },
 }
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: 'How to Automate GBP Review Replies with AI (Safely)',
-  description: 'Use AI to draft Google review replies safely: human-in-the-loop, tonal options, and how to handle negative reviews.',
+  headline: 'How to Automate Review Replies for GBP (Safely)',
+  description: 'Review response automation pros and cons. Use AI to draft Google review replies at scale without sounding robotic — human-in-the-loop GBP automation that keeps brand voice.',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -192,7 +192,7 @@ export default function BlogPost() {
                 className="mb-8"
             />
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">How to Automate GBP Review Replies with AI (Safely)</h1>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">How to Automate Review Replies for GBP (Safely)</h1>
             <p className="lead mt-4 text-xl text-muted-foreground">Full automation can feel robotic and risky. This guide covers the best practices for using AI to respond to Google reviews while keeping your brand's voice and ensuring every reply is perfect.</p>
           </div>
         </div>

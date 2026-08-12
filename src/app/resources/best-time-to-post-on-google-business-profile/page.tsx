@@ -13,12 +13,12 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 const imageUrl = "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/best%20time%20to%20post.png";
 
 export const metadata: Metadata = {
-  title: 'Best Time to Post on Google Business Profile (Based on Data)',
-  description: 'Best time to post on Google Business Profile: lunch and commute peaks, mid-week, and how to use your own GBP Insights. Google Business Profile posts expire after 7 days—post when it counts.',
-  keywords: ['best time to post on google business profile', 'best time to post on google my business', 'do google business profile posts expire after 7 days', 'posting times google analytics', 'gbp posts', 'when to post google business'],
+  title: 'Best Time to Post on Google Business Profile 2026 (Data-Backed)',
+  description: 'Best time to post on Google My Business and Google Business Profile in 2026. How often to post, how long Google posts last (they expire after 7 days), and peak times from GBP Insights.',
+  keywords: ['best time to post on google my business', 'how long do google posts last', 'how often should i post on google my business', 'google my business posts expire', 'best time to post on google business profile 2026', 'posting times google analytics', 'google business profile insights peak times', 'best time to post on google business profile', 'do google business profile posts expire after 7 days', 'gbp posts', 'when to post google business'],
   openGraph: {
-    title: 'Best Time to Post on Google Business Profile (Based on Data)',
-    description: 'Data-backed best times to post on GBP. Posts expire after 7 days—post when your customers are online.',
+    title: 'Best Time to Post on Google Business Profile 2026 (Data-Backed)',
+    description: 'Best time to post on Google My Business and Google Business Profile in 2026. How often to post, how long Google posts last (they expire after 7 days), and peak times from GBP Insights.',
     url: '/resources/best-time-to-post-on-google-business-profile',
     siteName: 'MyGoProfile',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Best Time to Post on Google Business Profile (Based on Data)',
-    description: 'Best times to post on GBP: lunch, commute, mid-week. Posts expire after 7 days.',
+    title: 'Best Time to Post on Google Business Profile 2026 (Data-Backed)',
+    description: 'Best time to post on Google My Business and Google Business Profile in 2026. How often to post, how long Google posts last (they expire after 7 days), and peak times from GBP Insights.',
     images: [imageUrl],
   },
 }
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: 'The Best Time to Post on Google Business Profile (Based on Data)',
-  description: 'Best time to post on Google Business Profile: data-backed times and days. Google Posts expire after 7 days—post when your customers are most active.',
+  headline: 'Best Time to Post on Google My Business / Google Business Profile',
+  description: 'Best time to post on Google My Business and Google Business Profile in 2026. How often to post, how long Google posts last (they expire after 7 days), and peak times from GBP Insights.',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -82,6 +82,22 @@ const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'Yes. Standard Google Business Profile posts (offers, updates, what\'s new) expire after 7 days. Event posts can last until the event date. Because posts expire quickly, timing matters—publish when your customers are most likely to see them.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How long do Google posts last?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Standard Google posts last 7 days, then they expire and disappear from your profile. Event posts can remain until the event ends. That’s why a weekly (or 2–3× weekly) posting cadence matters for ongoing visibility.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: 'How often should I post on Google My Business?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Post at least once per week. 2–3 times per week is ideal if you have offers or updates. Because posts expire after 7 days, less than weekly means your profile often has no live post.',
       },
     },
     {
@@ -200,7 +216,7 @@ export default function BlogPost() {
                 className="mb-8"
             />
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">The Best Time to Post on Google Business Profile (Based on Data)</h1>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">Best Time to Post on Google My Business / Google Business Profile</h1>
             <p className="lead mt-4 text-xl text-muted-foreground">Timing is everything. Posting an update when your customers aren't online is a wasted opportunity. We've analyzed the data to help you figure out the optimal time to publish your Google Posts.</p>
           </div>
         </div>
@@ -274,6 +290,14 @@ export default function BlogPost() {
               <div>
                 <h3 className="text-xl font-semibold mb-2">Do Google Business Profile posts expire after 7 days?</h3>
                 <p>Yes. Standard Google Business Profile posts (offers, updates, what&apos;s new) expire after 7 days. Event posts can last until the event date. Because posts expire quickly, timing matters—publish when your customers are most likely to see them.</p>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold mb-2">How long do Google posts last?</h3>
+                <p>Standard Google posts last <strong>7 days</strong>, then they expire and disappear from your profile. Event posts can remain until the event ends. That&apos;s why a weekly (or 2–3× weekly) posting cadence matters for ongoing visibility.</p>
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold mb-2">How often should I post on Google My Business?</h3>
+                <p>Post at least once per week. <strong>2–3 times per week</strong> is ideal if you have offers or updates. Because posts expire after 7 days, posting less than weekly means your profile often has no live post.</p>
               </div>
               <div>
                 <h3 className="text-xl font-semibold mb-2">What is the best time to post on Google My Business?</h3>

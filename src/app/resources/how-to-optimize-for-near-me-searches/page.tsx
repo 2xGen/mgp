@@ -13,12 +13,12 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 const imageUrl = "https://ouqeoizufbofdqbuiwvx.supabase.co/storage/v1/object/public/MGP%20Blogs/how%20to%20optimize%20your%20gbp.png";
 
 export const metadata: Metadata = {
-  title: 'How to Optimize Your GBP for “Near Me” Searches',
-  description: 'Rank for "near me" searches: NAP consistency, right categories, local content, reviews, and geotagged photos. Get your Google Business Profile in front of nearby customers.',
-  keywords: ['near me searches', 'optimize GBP for near me', 'rank for near me searches', 'google business profile near me', 'local SEO near me', 'GBP near me optimization'],
+  title: 'GBP Optimization for Near Me Searches: Rank in the Local Pack',
+  description: 'GBP optimization for near me searches: NAP consistency, categories, local content, reviews, and photos so your Google Business Profile ranks when customers search nearby.',
+  keywords: ['gbp optimization near me', 'optimize near me', 'near me searches', 'optimize GBP for near me', 'rank for near me searches', 'google business profile near me', 'local SEO near me', 'GBP near me optimization'],
   openGraph: {
-    title: 'How to Optimize Your GBP for “Near Me” Searches',
-    description: 'Rank for "near me" searches with NAP, categories, local content, reviews, and photos. Get visible to nearby customers.',
+    title: 'GBP Optimization for Near Me Searches: Rank in the Local Pack',
+    description: 'GBP optimization for near me searches: NAP consistency, categories, local content, reviews, and photos so your Google Business Profile ranks when customers search nearby.',
     url: '/resources/how-to-optimize-for-near-me-searches',
     siteName: 'MyGoProfile',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Optimize Your GBP for “Near Me” Searches',
-    description: 'Rank for "near me" searches: NAP, categories, local content, reviews, geotagged photos.',
+    title: 'GBP Optimization for Near Me Searches: Rank in the Local Pack',
+    description: 'GBP optimization for near me searches: NAP consistency, categories, local content, reviews, and photos so your Google Business Profile ranks when customers search nearby.',
     images: [imageUrl],
   },
 }
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: 'How to Optimize Your GBP for “Near Me” Searches',
-  description: 'Rank for "near me" searches with NAP consistency, categories, local content, reviews, and geotagged photos. Get your Google Business Profile in front of nearby customers.',
+  headline: 'GBP Optimization for “Near Me” Searches',
+  description: 'GBP optimization for near me searches: NAP consistency, categories, local content, reviews, and photos so your Google Business Profile ranks when customers search nearby.',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -200,7 +200,7 @@ export default function BlogPost() {
                 className="mb-8"
             />
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">How to Optimize Your GBP for “Near Me” Searches</h1>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">GBP Optimization for “Near Me” Searches</h1>
             <p className="lead mt-4 text-xl text-muted-foreground">"Near me" searches are the lifeblood of local businesses. This guide covers the essential strategies to ensure your Google Business Profile appears at the top when high-intent customers are searching nearby.</p>
           </div>
         </div>

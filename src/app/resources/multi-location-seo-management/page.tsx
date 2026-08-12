@@ -13,12 +13,12 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 const imageUrl = "https://soaacpusdhyxwucjhhpy.supabase.co/storage/v1/object/public/MGP/Multi-Location%20SEO%20How%20to%20Manage%20Google%20Business%20Profiles%20at%20Scale.jpg";
 
 export const metadata: Metadata = {
-  title: 'How to Manage Multiple Google Business Profiles (Multi-Location SEO Guide)',
-  description: 'Manage multiple Google Business Profiles: consistency vs local relevance, one dashboard, and how to scale without burning out. For franchises and agencies.',
-  keywords: ['multi-location SEO', 'manage multiple GBP', 'franchise Google Business Profile management', 'GBP at scale'],
+  title: 'How to Manage Multiple Google Business Profile Accounts',
+  description: 'Manage multiple business profile accounts without logging in/out: franchise GBP management, multi-location consistency, and GBP management software for multiple accounts.',
+  keywords: ['manage multiple business profile accounts', 'gbp management software multiple accounts', 'franchise google business profile management', 'multi-location SEO', 'manage multiple GBP', 'GBP at scale'],
   openGraph: {
-    title: 'How to Manage Multiple Google Business Profiles (Multi-Location SEO Guide)',
-    description: 'Master multi-location SEO by learning to efficiently manage multiple Google Business Profiles. Our guide covers consistency, local optimization, and scaling strategies for franchises.',
+    title: 'How to Manage Multiple Google Business Profile Accounts',
+    description: 'Manage multiple business profile accounts without logging in/out: franchise GBP management, multi-location consistency, and GBP management software for multiple accounts.',
     url: '/resources/multi-location-seo-management',
     siteName: 'MyGoProfile',
     images: [
@@ -36,8 +36,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'How to Manage Multiple Google Business Profiles (Multi-Location SEO Guide)',
-    description: 'Master multi-location SEO by learning to efficiently manage multiple Google Business Profiles. Our guide covers consistency, local optimization, and scaling strategies for franchises.',
+    title: 'How to Manage Multiple Google Business Profile Accounts',
+    description: 'Manage multiple business profile accounts without logging in/out: franchise GBP management, multi-location consistency, and GBP management software for multiple accounts.',
     images: [imageUrl],
   },
 }
@@ -45,8 +45,8 @@ export const metadata: Metadata = {
 const blogJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
-  headline: 'How to Manage Multiple Google Business Profiles (Multi-Location SEO Guide)',
-  description: 'Master multi-location SEO by learning to efficiently manage multiple Google Business Profiles. Our guide covers consistency, local optimization, and scaling strategies for franchises.',
+  headline: 'How to Manage Multiple Google Business Profile Accounts',
+  description: 'Manage multiple business profile accounts without logging in/out: franchise GBP management, multi-location consistency, and GBP management software for multiple accounts.',
   image: imageUrl,
   datePublished: new Date().toISOString(),
   author: {
@@ -212,7 +212,7 @@ export default function BlogPostPage4() {
                 className="mb-8"
             />
           <div className="text-center">
-            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">How to Manage Multiple Google Business Profiles (Multi-Location SEO Guide)</h1>
+            <h1 className="text-4xl font-bold tracking-tight md:text-5xl">How to Manage Multiple Google Business Profile Accounts</h1>
             <p className="lead mt-4 text-xl text-muted-foreground">A practical guide for franchises, agencies, and small businesses on how to dominate local search across all your locations without losing your mind.</p>
           </div>
         </div>

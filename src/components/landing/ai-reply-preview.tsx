@@ -67,16 +67,19 @@ export default function AiReplyPreview() {
   }, [activeTone]);
 
   return (
-    <div className="grid grid-cols-1 items-center gap-12 md:grid-cols-2 lg:gap-20">
-      <div className="flex flex-col items-start gap-4 md:order-2">
+    <div className="grid grid-cols-1 items-center gap-10 md:grid-cols-2 lg:gap-16">
+      <div className="order-1 flex flex-col items-start gap-4 md:order-2">
             <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-                Instant, On-Brand Replies
+                AI review replies
             </div>
             <h2 className="font-headline text-3xl font-semibold tracking-tight md:text-4xl">
-                Respond to Reviews <span className="bg-gradient-brand animate-gradient-flow bg-[length:400%_400%] bg-clip-text text-transparent">in Seconds</span> with AI
+                Reply to every review{' '}
+                <span className="bg-gradient-brand animate-gradient-flow bg-[length:400%_400%] bg-clip-text text-transparent">
+                  without the blank page
+                </span>
             </h2>
             <p className="text-lg text-muted-foreground">
-                Never miss a chance to engage a customer again. Our AI drafts personalized review replies in three distinct tones, so you can pick the perfect one and post it in a single click.
+                AI drafts on-brand replies in three tones. Pick one, tweak if you want, post — so unanswered reviews stop sitting on your profile.
             </p>
              <ul className="space-y-2 text-muted-foreground">
                 <li className="flex items-center gap-2">
@@ -92,14 +95,14 @@ export default function AiReplyPreview() {
                   Maintain a perfect response rate effortlessly.
                 </li>
               </ul>
-              <Link href="/pricing" className="mt-4 w-full">
-                <Button size="lg" variant="outline" className="w-full">
-                    Get Started for Free
+              <Link href="/login" className="mt-2">
+                <Button size="lg" variant="outline">
+                    Start free trial
                     <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
             </Link>
         </div>
-        <div className="flex flex-col gap-6 md:order-1">
+        <div className="order-2 flex min-w-0 flex-col gap-4 md:order-1">
         <StatusCard responded={isResponded} />
         <Card className="shadow-2xl">
             <CardHeader>
